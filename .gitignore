@@ -1,0 +1,9 @@
+.idea
+*.iws
+*.iml
+*.ipr
+out/
+target/
+.gradle/
+build/
+src/main/resources
