@@ -1,3 +1,6 @@
+import java.util.*
+import java.util.Calendar.DAY_OF_MONTH
+
 plugins {
     kotlin("jvm") version embeddedKotlinVersion
 }
@@ -17,4 +20,52 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+tasks.register<InitDayTask>("initDay") {
+    group = "generation"
+    description = "Init sources for day of advent calendar"
+}
+abstract class InitDayTask : DefaultTask() {
+    @Input
+    @Option(description = "day in advent calendar (defaults to current day of month)")
+    var day: String = "${Calendar.getInstance().get(DAY_OF_MONTH)}"
+
+    @Input
+    @Option(description = "use LongDay interface for long results")
+    var long: Boolean = false
+
+    @Input
+    @Option(description = "overwrite existing sources")
+    var force: Boolean = false
+
+    @get:Inject
+    protected abstract val layout: ProjectLayout
+
+    @TaskAction
+    fun initDay() {
+        val dir = File(layout.projectDirectory.asFile, "src/main/kotlin/com/github/fstaudt/aoc2023/day$day").also { it.mkdirs() }
+        File(dir, "Day$day.kt").also {
+            if (it.exists() && !force) throw Exception("Sources for day $day already exist.")
+            it.writeText("""
+                package com.github.fstaudt.aoc2023.day$day
+
+                import com.github.fstaudt.aoc2023.shared.${if (long) "Long" else ""}Day
+                import com.github.fstaudt.aoc2023.shared.readInputLines
+
+                fun main() {
+                    Day$day().run()
+                }
+
+                class Day$day : ${if (long) "Long" else ""}Day {
+                    override val input: List<String> = readInputLines($day)
+
+                    override fun part1() = 0${if (long) "L" else ""}
+
+                    override fun part2() = 0${if (long) "L" else ""}
+
+                }
+            """.trimIndent())
+        }
+    }
 }
