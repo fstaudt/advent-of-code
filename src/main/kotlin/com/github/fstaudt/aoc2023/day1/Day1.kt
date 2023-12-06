@@ -7,10 +7,9 @@ fun main() {
     Day1().run()
 }
 
+class Day1(fileName: String = "day_1.txt") : Day {
 
-class Day1 : Day {
-
-    override val input: List<String> = readInputLines(1)
+    override val input = readInputLines(fileName)
 
     override fun part1() = input.sumCalibrationValues()
 
@@ -36,6 +35,6 @@ class Day1 : Day {
             startsWith("nine") -> "9"
             first().isDigit() -> "${first()}"
             else -> ""
-        }.let { "${it}${substring(1).replaceSpelledDigits()}"}
+        }.let { "${it}${substring(1).replaceSpelledDigits()}" }
     }
 }

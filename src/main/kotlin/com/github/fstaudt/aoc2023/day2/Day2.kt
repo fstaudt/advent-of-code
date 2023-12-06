@@ -9,9 +9,9 @@ fun main() {
 }
 
 
-class Day2 : Day {
+class Day2(fileName: String = "day_2.txt") : Day {
 
-    override val input: List<String> = readInputLines(2)
+    override val input: List<String> = readInputLines(fileName)
 
     override fun part1() = input.sumIdOfPossibleGames()
 
