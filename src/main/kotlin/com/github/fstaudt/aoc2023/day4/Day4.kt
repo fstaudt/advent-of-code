@@ -2,6 +2,8 @@ package com.github.fstaudt.aoc2023.day4
 
 import com.github.fstaudt.aoc2023.shared.Day
 import com.github.fstaudt.aoc2023.shared.readInputLines
+import com.github.fstaudt.aoc2023.shared.splitInts
+import com.github.fstaudt.aoc2023.shared.toGroupValue
 import kotlin.math.min
 
 fun main() {
@@ -30,10 +32,10 @@ class Day4(fileName: String = "day_4.txt") : Day {
 
     private fun String.toCard(): Card {
         return split(":").let { card ->
-            val id = Regex("Card +(\\d+)").find(card[0])!!.groupValues[1].toInt()
+            val id = card[0].toGroupValue("Card +(\\d+)", 1).toInt()
             card[1].split("|").let { allNumbers ->
-                val winningNumbers = allNumbers[0].split(" ").filter { it.isNotBlank() }.map { it.toInt() }
-                val numbers = allNumbers[1].split(" ").filter { it.isNotBlank() }.map { it.toInt() }
+                val winningNumbers = allNumbers[0].splitInts()
+                val numbers = allNumbers[1].splitInts()
                 Card(id, 1, winningNumbers, numbers)
             }
         }

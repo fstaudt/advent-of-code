@@ -2,6 +2,8 @@ package com.github.fstaudt.aoc2023.day6
 
 import com.github.fstaudt.aoc2023.shared.Day
 import com.github.fstaudt.aoc2023.shared.readInputLines
+import com.github.fstaudt.aoc2023.shared.splitLongs
+import com.github.fstaudt.aoc2023.shared.toGroupValue
 
 fun main() {
     Day6().run()
@@ -9,17 +11,18 @@ fun main() {
 
 class Day6(fileName: String = "day_6.txt") : Day {
     override val input: List<String> = readInputLines(fileName)
-    private val times = Regex("Time: +(.*)").find(input[0])!!.groupValues[1]
-            .split(" ").filter { it.isNotBlank() }.map { it.toLong() }
-    private val distances = Regex("Distance: +(.*)").find(input[1])!!.groupValues[1]
-            .split(" ").filter { it.isNotBlank() }.map { it.toLong() }
+    private val times = input[0].toGroupValue("Time: +(.*)", 1).splitLongs()
+    private val distances = input[1].toGroupValue("Distance: +(.*)", 1).splitLongs()
 
-    override fun part1(): Int {
+    override fun part1() = productOfWinningWays()
+    override fun part2() = longWinningWays()
+
+    private fun productOfWinningWays(): Int {
         val races = times.mapIndexed { i, time -> Race(time, distances[i]) }
         return races.map { it.winningWays() }.reduce { product, number -> product * number }
     }
 
-    override fun part2(): Int {
+    private fun longWinningWays(): Int {
         val longTime = times.fold("") { long, time -> "$long$time" }.toLong()
         val longDistance = distances.fold("") { long, distance -> "$long$distance" }.toLong()
         return Race(longTime, longDistance).winningWays()
