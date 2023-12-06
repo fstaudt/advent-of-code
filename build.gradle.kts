@@ -44,10 +44,12 @@ abstract class InitDayTask : DefaultTask() {
 
     @TaskAction
     fun initDay() {
-        val dir = File(layout.projectDirectory.asFile, "src/main/kotlin/com/github/fstaudt/aoc2023/day$day").also { it.mkdirs() }
-        File(dir, "Day$day.kt").also {
-            if (it.exists() && !force) throw Exception("Sources for day $day already exist.")
-            it.writeText("""
+        val packageDir = "com/github/fstaudt/aoc2023/day$day"
+        File(layout.projectDirectory.asFile, "src/main/kotlin/$packageDir").also {
+            it.mkdirs()
+            File(it, "Day$day.kt").also {
+                if (it.exists() && !force) throw Exception("Sources for day $day already exist.")
+                it.writeText("""
                 package com.github.fstaudt.aoc2023.day$day
 
                 import com.github.fstaudt.aoc2023.shared.${if (long) "Long" else ""}Day
@@ -57,8 +59,8 @@ abstract class InitDayTask : DefaultTask() {
                     Day$day().run()
                 }
 
-                class Day$day : ${if (long) "Long" else ""}Day {
-                    override val input: List<String> = readInputLines($day)
+                class Day$day(fileName: String = "day_$day.txt") : ${if (long) "Long" else ""}Day {
+                    override val input: List<String> = readInputLines(fileName)
 
                     override fun part1() = 0${if (long) "L" else ""}
 
@@ -66,6 +68,54 @@ abstract class InitDayTask : DefaultTask() {
 
                 }
             """.trimIndent())
+            }
         }
+        File(layout.projectDirectory.asFile, "src/main/resources").also {
+            it.mkdirs()
+            File(it, "day_$day.txt").writeText("")
+        }
+        File(layout.projectDirectory.asFile, "src/test/kotlin/$packageDir").also {
+            it.mkdirs()
+            File(it, "Day$day.kt").also {
+                it.writeText("""
+                package com.github.fstaudt.aoc2023.day$day
+
+                import org.assertj.core.api.Assertions.assertThat
+                import org.junit.jupiter.api.Test
+                
+                class Day${day}Test {
+                
+                    companion object {
+                        private const val EXAMPLE = "example_day$day.txt"
+                    }
+                
+                    @Test
+                    fun `part 1 should produce expected result for example`() {
+                        assertThat(Day$day(EXAMPLE).part1()).isEqualTo(0)
+                    }
+                
+                    @Test
+                    fun `part 2 should produce expected result for example`() {
+                        assertThat(Day$day(EXAMPLE).part2()).isEqualTo(0)
+                    }
+                
+                    @Test
+                    fun `part 1 should produce expected result for my input`() {
+                        assertThat(Day$day().part1()).isEqualTo(0)
+                    }
+                
+                    @Test
+                    fun `part 2 should produce expected result for my input`() {
+                        assertThat(Day$day().part2()).isEqualTo(0)
+                    }
+                }
+            """.trimIndent())
+            }
+        }
+        File(layout.projectDirectory.asFile, "src/test/resources").also {
+            it.mkdirs()
+            File(it, "example_day$day.txt").writeText("")
+        }
+
     }
 }
