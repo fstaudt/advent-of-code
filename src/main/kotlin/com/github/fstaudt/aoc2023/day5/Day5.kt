@@ -52,12 +52,12 @@ class Day5(fileName: String = "day_5.txt") : LongDay {
 
     private fun Seed.mapNumber(): Long {
         return seedToSoilMappings.mapNumber(number)
-                .also { soil -> soilToFertilizerMappings.mapNumber(soil) }
-                .also { fertilizer -> fertilizerToWaterMappings.mapNumber(fertilizer) }
-                .also { water -> waterToLightMappings.mapNumber(water) }
-                .also { light -> lightToTemperatureMappings.mapNumber(light) }
-                .also { temperature -> temperatureToHumidityMappings.mapNumber(temperature) }
-                .also { humidity -> humidityToLocationMappings.mapNumber(humidity) }
+                .let { soil -> soilToFertilizerMappings.mapNumber(soil) }
+                .let { fertilizer -> fertilizerToWaterMappings.mapNumber(fertilizer) }
+                .let { water -> waterToLightMappings.mapNumber(water) }
+                .let { light -> lightToTemperatureMappings.mapNumber(light) }
+                .let { temperature -> temperatureToHumidityMappings.mapNumber(temperature) }
+                .let { humidity -> humidityToLocationMappings.mapNumber(humidity) }
     }
 
     data class Seed(var number: Long)
