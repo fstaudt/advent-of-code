@@ -9,9 +9,9 @@ fun main() {
     Day3().run()
 }
 
-class Day3 : Day {
+class Day3(fileName: String = "day_3.txt") : Day {
 
-    override val input: List<String> = readInputLines(3)
+    override val input: List<String> = readInputLines(fileName)
 
     override fun part1() = input.partNumbers().sumOf { it.value }
     override fun part2() = input.sumGearRatios()
@@ -40,13 +40,13 @@ class Day3 : Day {
                 val endIndex = min(partIndex + it.length, line.length - 1)
                 index = endIndex
                 PartNumber(
-                    it.toInt(),
-                    lineIndex,
-                    partIndex,
-                    previousLine.substring(startIndex, endIndex + 1).toSymbols(lineIndex, startIndex)
-                            + listOf(Symbol(line[startIndex], lineIndex, startIndex)).filter { it.isSymbol() }
-                            + listOf(Symbol(line[endIndex], lineIndex, endIndex)).filter { it.isSymbol() }
-                            + nextLine.substring(startIndex, endIndex + 1).toSymbols(lineIndex + 2, startIndex)
+                        it.toInt(),
+                        lineIndex,
+                        partIndex,
+                        previousLine.substring(startIndex, endIndex + 1).toSymbols(lineIndex, startIndex)
+                                + listOf(Symbol(line[startIndex], lineIndex, startIndex)).filter { it.isSymbol() }
+                                + listOf(Symbol(line[endIndex], lineIndex, endIndex)).filter { it.isSymbol() }
+                                + nextLine.substring(startIndex, endIndex + 1).toSymbols(lineIndex + 2, startIndex)
                 )
             }.filter { it.symbols.isNotEmpty() }
         }

@@ -9,9 +9,9 @@ fun main() {
 }
 
 
-class Day5 : LongDay {
+class Day5(fileName: String = "day_5.txt") : LongDay {
 
-    override val input: List<String> = readInputLines(5)
+    override val input: List<String> = readInputLines(fileName)
     private val seedToSoilMappings = input.toMappings("seed-to-soil")
     private val soilToFertilizerMappings = input.toMappings("soil-to-fertilizer")
     private val fertilizerToWaterMappings = input.toMappings("fertilizer-to-water")

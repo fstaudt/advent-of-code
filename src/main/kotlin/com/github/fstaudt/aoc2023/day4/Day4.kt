@@ -9,9 +9,9 @@ fun main() {
 }
 
 
-class Day4 : Day {
+class Day4(fileName: String = "day_4.txt") : Day {
 
-    override val input: List<String> = readInputLines(4)
+    override val input: List<String> = readInputLines(fileName)
 
     override fun part1() = input.sumOfPoints()
 

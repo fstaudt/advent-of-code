@@ -7,12 +7,12 @@ fun main() {
     Day6().run()
 }
 
-class Day6 : Day {
-    override val input: List<String> = readInputLines(6)
+class Day6(fileName: String = "day_6.txt") : Day {
+    override val input: List<String> = readInputLines(fileName)
     private val times = Regex("Time: +(.*)").find(input[0])!!.groupValues[1]
-        .split(" ").filter { it.isNotBlank() }.map { it.toLong() }
+            .split(" ").filter { it.isNotBlank() }.map { it.toLong() }
     private val distances = Regex("Distance: +(.*)").find(input[1])!!.groupValues[1]
-        .split(" ").filter { it.isNotBlank() }.map { it.toLong() }
+            .split(" ").filter { it.isNotBlank() }.map { it.toLong() }
 
     override fun part1(): Int {
         val races = times.mapIndexed { i, time -> Race(time, distances[i]) }
