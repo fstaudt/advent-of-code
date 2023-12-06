@@ -15,7 +15,7 @@ repositories {
 dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.0")
     testImplementation("org.assertj:assertj-core:3.24.2")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.0")
 }
 
 tasks.test {
@@ -46,10 +46,10 @@ abstract class InitDayTask : DefaultTask() {
     fun initDay() {
         val packageDir = "com/github/fstaudt/aoc2023/day$day"
         File(layout.projectDirectory.asFile, "src/main/kotlin/$packageDir").also {
+            if (it.exists() && !force) throw Exception("Sources for day $day already exist.")
             it.mkdirs()
-            File(it, "Day$day.kt").also {
-                if (it.exists() && !force) throw Exception("Sources for day $day already exist.")
-                it.writeText("""
+            File(it, "Day$day.kt").writeText(
+                """
                 package com.github.fstaudt.aoc2023.day$day
 
                 import com.github.fstaudt.aoc2023.shared.${if (long) "Long" else ""}Day
@@ -67,8 +67,8 @@ abstract class InitDayTask : DefaultTask() {
                     override fun part2() = 0${if (long) "L" else ""}
 
                 }
-            """.trimIndent())
-            }
+                """.trimIndent()
+            )
         }
         File(layout.projectDirectory.asFile, "src/main/resources").also {
             it.mkdirs()
@@ -76,8 +76,8 @@ abstract class InitDayTask : DefaultTask() {
         }
         File(layout.projectDirectory.asFile, "src/test/kotlin/$packageDir").also {
             it.mkdirs()
-            File(it, "Day$day.kt").also {
-                it.writeText("""
+            File(it, "Day${day}Test.kt").writeText(
+                """
                 package com.github.fstaudt.aoc2023.day$day
 
                 import org.assertj.core.api.Assertions.assertThat
@@ -109,8 +109,8 @@ abstract class InitDayTask : DefaultTask() {
                         assertThat(Day$day().part2()).isEqualTo(0)
                     }
                 }
-            """.trimIndent())
-            }
+                """.trimIndent()
+            )
         }
         File(layout.projectDirectory.asFile, "src/test/resources").also {
             it.mkdirs()
