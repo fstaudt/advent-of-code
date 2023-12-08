@@ -1,7 +1,6 @@
-import init.day.InitDayTask
-
 plugins {
     kotlin("jvm") version embeddedKotlinVersion
+    id("buildSrc.aoc")
 }
 
 group = "com.github.fstaudt"
@@ -20,5 +19,3 @@ dependencies {
 tasks.test {
     useJUnitPlatform()
 }
-
-tasks.register<InitDayTask>("initDay")

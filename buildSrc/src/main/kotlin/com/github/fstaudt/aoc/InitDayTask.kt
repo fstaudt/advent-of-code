@@ -1,8 +1,7 @@
-package init.day
+package com.github.fstaudt.aoc
 
-import org.apache.http.client.methods.HttpGet
-import org.apache.http.impl.client.HttpClientBuilder
-import org.apache.http.message.BasicHeader
+import com.github.fstaudt.aoc.AdventOfCodePlugin.Companion.GROUP
+import com.github.fstaudt.aoc.service.input
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.tasks.Input
@@ -18,7 +17,7 @@ import java.util.Calendar.YEAR
 import javax.inject.Inject
 
 abstract class InitDayTask : DefaultTask() {
-    override fun getGroup() = "generation"
+    override fun getGroup() = GROUP
     override fun getDescription() = "Init sources for day of advent calendar"
 
     @Input
@@ -74,12 +73,7 @@ abstract class InitDayTask : DefaultTask() {
         }
         File(layout.projectDirectory.asFile, "src/main/resources").also { mainResources ->
             mainResources.mkdirs()
-            val cookie = sessionCookieFile.readLines().first { it.isNotBlank() }
-            HttpClientBuilder.create().setDefaultHeaders(listOf(BasicHeader("Cookie", cookie))).build()
-                .execute(HttpGet("https://adventofcode.com/$year/day/$day/input"))
-                .entity.content.readAllBytes().let {
-                    File(mainResources, "day_$day.txt").writeText(String(it))
-                }
+            File(mainResources, "day_$day.txt").writeText(input(day, year, sessionCookieFile))
         }
         File(layout.projectDirectory.asFile, "src/test/kotlin/$packageDir").also { testSources ->
             testSources.mkdirs()
