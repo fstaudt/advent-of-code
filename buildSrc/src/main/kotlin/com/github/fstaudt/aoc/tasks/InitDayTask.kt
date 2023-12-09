@@ -1,6 +1,7 @@
-package com.github.fstaudt.aoc
+package com.github.fstaudt.aoc.tasks
 
 import com.github.fstaudt.aoc.AdventOfCodePlugin.Companion.GROUP
+import com.github.fstaudt.aoc.exception.AdventIsOverException
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.tasks.Input
@@ -13,6 +14,10 @@ import java.util.Calendar.YEAR
 import javax.inject.Inject
 
 abstract class InitDayTask : DefaultTask() {
+    companion object {
+        const val NAME = "initDay"
+    }
+
     override fun getGroup() = GROUP
     override fun getDescription() = "Init sources for day of advent calendar"
 
@@ -33,6 +38,7 @@ abstract class InitDayTask : DefaultTask() {
 
     @TaskAction
     fun initDay() {
+        if (day > "25") throw AdventIsOverException(day)
         val packageDir = "com/github/fstaudt/aoc$year/day$day"
         File(layout.projectDirectory.asFile, "src/main/kotlin/$packageDir").also { mainSources ->
             if (mainSources.exists() && !force) throw Exception("Sources for day $day already exist.")

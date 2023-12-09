@@ -11,6 +11,9 @@ dependencies {
     implementation("org.apache.httpcomponents:httpclient:4.5.14") {
         exclude("commons-codec", "commons-codec")
     }
+    implementation("org.knowm.xchart:xchart:3.8.3")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.15.3")
+    api("com.fasterxml.jackson.module:jackson-module-kotlin:2.15.3")
 }
 
 
