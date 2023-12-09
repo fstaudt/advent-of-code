@@ -1,6 +1,7 @@
-package com.github.fstaudt.aoc
+package com.github.fstaudt.aoc.tasks
 
 import com.github.fstaudt.aoc.AdventOfCodePlugin.Companion.GROUP
+import com.github.fstaudt.aoc.exception.AdventIsOverException
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.message.BasicHeader
@@ -19,6 +20,10 @@ import java.util.Calendar.YEAR
 import javax.inject.Inject
 
 abstract class FetchDayInputTask : DefaultTask() {
+    companion object {
+        const val NAME = "fetchDayInput"
+    }
+
     override fun getGroup() = GROUP
     override fun getDescription() = "Fetch input for day of advent calendar"
 
@@ -38,7 +43,8 @@ abstract class FetchDayInputTask : DefaultTask() {
     protected abstract val layout: ProjectLayout
 
     @TaskAction
-    fun initDay() {
+    fun fetchDayInput() {
+        if (day > "25") throw AdventIsOverException(day)
         File(layout.projectDirectory.asFile, "src/main/resources").also { mainResources ->
             mainResources.mkdirs()
             File(mainResources, "day_$day.txt").writeText(input())
