@@ -1,13 +1,9 @@
 package com.github.fstaudt.aoc
 
 import com.github.fstaudt.aoc.AdventOfCodePlugin.Companion.GROUP
-import com.github.fstaudt.aoc.service.input
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputFile
-import org.gradle.api.tasks.PathSensitive
-import org.gradle.api.tasks.PathSensitivity.ABSOLUTE
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.options.Option
 import java.io.File
@@ -27,10 +23,6 @@ abstract class InitDayTask : DefaultTask() {
     @Input
     @Option(description = "year of advent calendar (defaults to current year)")
     var year: String = "${Calendar.getInstance().get(YEAR)}"
-
-    @InputFile
-    @PathSensitive(ABSOLUTE)
-    var sessionCookieFile: File = File("cookie.txt")
 
     @Input
     @Option(description = "overwrite existing sources")
@@ -69,7 +61,7 @@ abstract class InitDayTask : DefaultTask() {
         }
         File(layout.projectDirectory.asFile, "src/main/resources").also { mainResources ->
             mainResources.mkdirs()
-            File(mainResources, "day_$day.txt").writeText(input(day, year, sessionCookieFile))
+            File(mainResources, "day_$day.txt").takeUnless { it.exists() }?.writeText("")
         }
         File(layout.projectDirectory.asFile, "src/test/kotlin/$packageDir").also { testSources ->
             testSources.mkdirs()
@@ -111,7 +103,7 @@ abstract class InitDayTask : DefaultTask() {
         }
         File(layout.projectDirectory.asFile, "src/test/resources").also { testResources ->
             testResources.mkdirs()
-            File(testResources, "example_day$day.txt").writeText("")
+            File(testResources, "example_day$day.txt").takeUnless { it.exists() }?.writeText("")
         }
     }
 }

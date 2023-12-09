@@ -1,7 +1,9 @@
 package com.github.fstaudt.aoc
 
 import com.github.fstaudt.aoc.AdventOfCodePlugin.Companion.GROUP
-import com.github.fstaudt.aoc.service.input
+import org.apache.http.client.methods.HttpGet
+import org.apache.http.impl.client.HttpClientBuilder
+import org.apache.http.message.BasicHeader
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.tasks.Input
@@ -39,7 +41,14 @@ abstract class FetchDayInputTask : DefaultTask() {
     fun initDay() {
         File(layout.projectDirectory.asFile, "src/main/resources").also { mainResources ->
             mainResources.mkdirs()
-            File(mainResources, "day_$day.txt").writeText(input(day, year, sessionCookieFile))
+            File(mainResources, "day_$day.txt").writeText(input())
         }
+    }
+
+    private fun input(): String {
+        val cookie = sessionCookieFile.readLines().first { it.isNotBlank() }
+        return HttpClientBuilder.create().setDefaultHeaders(listOf(BasicHeader("Cookie", cookie))).build()
+            .execute(HttpGet("https://adventofcode.com/$year/day/$day/input"))
+            .entity.content.readAllBytes().let { String(it) }
     }
 }
