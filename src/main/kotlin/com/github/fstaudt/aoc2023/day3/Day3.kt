@@ -17,7 +17,7 @@ class Day3(fileName: String = "day_3.txt") : Day {
     override fun part2() = input.sumGearRatios()
 
 
-    private fun List<String>.sumGearRatios(): Int {
+    private fun List<String>.sumGearRatios(): Long {
         val partNumbers = partNumbers().filter { it.symbols.any { it.char == '*' } }
         return partNumbers.mapNotNull { partNumber ->
             partNumbers.find {
@@ -40,13 +40,13 @@ class Day3(fileName: String = "day_3.txt") : Day {
                 val endIndex = min(partIndex + it.length, line.length - 1)
                 index = endIndex
                 PartNumber(
-                        it.toInt(),
-                        lineIndex,
-                        partIndex,
-                        previousLine.substring(startIndex, endIndex + 1).toSymbols(lineIndex, startIndex)
-                                + listOf(Symbol(line[startIndex], lineIndex, startIndex)).filter { it.isSymbol() }
-                                + listOf(Symbol(line[endIndex], lineIndex, endIndex)).filter { it.isSymbol() }
-                                + nextLine.substring(startIndex, endIndex + 1).toSymbols(lineIndex + 2, startIndex)
+                    it.toLong(),
+                    lineIndex,
+                    partIndex,
+                    previousLine.substring(startIndex, endIndex + 1).toSymbols(lineIndex, startIndex)
+                            + listOf(Symbol(line[startIndex], lineIndex, startIndex)).filter { it.isSymbol() }
+                            + listOf(Symbol(line[endIndex], lineIndex, endIndex)).filter { it.isSymbol() }
+                            + nextLine.substring(startIndex, endIndex + 1).toSymbols(lineIndex + 2, startIndex)
                 )
             }.filter { it.symbols.isNotEmpty() }
         }
@@ -59,7 +59,7 @@ class Day3(fileName: String = "day_3.txt") : Day {
     }
 
 
-    private data class PartNumber(val value: Int, val line: Int, val index: Int, val symbols: List<Symbol>)
+    private data class PartNumber(val value: Long, val line: Int, val index: Int, val symbols: List<Symbol>)
     private data class Symbol(val char: Char, val line: Int, val index: Int) {
         fun isSymbol() = char != '.' && !char.isDigit()
     }

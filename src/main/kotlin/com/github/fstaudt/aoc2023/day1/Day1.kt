@@ -15,7 +15,7 @@ class Day1(fileName: String = "day_1.txt") : Day {
 
     override fun part2() = input.sumSpelledCalibrationValues()
 
-    private fun List<String>.sumCalibrationValues() = sumOf { "${it.firstDigit()}${it.lastDigit()}".toInt() }
+    private fun List<String>.sumCalibrationValues() = sumOf { "${it.firstDigit()}${it.lastDigit()}".toLong() }
     private fun List<String>.sumSpelledCalibrationValues() = map { it.replaceSpelledDigits() }.sumCalibrationValues()
 
     private fun String.firstDigit() = first { it.isDigit() }

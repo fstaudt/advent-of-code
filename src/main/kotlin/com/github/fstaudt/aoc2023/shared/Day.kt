@@ -4,9 +4,9 @@ interface Day {
 
     val input: List<Any>
 
-    fun part1(): Int
+    fun part1(): Long
 
-    fun part2(): Int
+    fun part2(): Long
 
     fun run() {
         println("Part 1: ${part1()}")
