@@ -17,18 +17,18 @@ class Day6(fileName: String = "day_6.txt") : Day {
     override fun part1() = productOfWinningWays()
     override fun part2() = longWinningWays()
 
-    private fun productOfWinningWays(): Int {
+    private fun productOfWinningWays(): Long {
         val races = times.mapIndexed { i, time -> Race(time, distances[i]) }
         return races.map { it.winningWays() }.reduce { product, number -> product * number }
     }
 
-    private fun longWinningWays(): Int {
+    private fun longWinningWays(): Long {
         val longTime = times.fold("") { long, time -> "$long$time" }.toLong()
         val longDistance = distances.fold("") { long, distance -> "$long$distance" }.toLong()
         return Race(longTime, longDistance).winningWays()
     }
 
     data class Race(val time: Long, val distance: Long) {
-        fun winningWays() = (1..<time).count { it * (time - it) > distance }
+        fun winningWays() = (1..<time).count { it * (time - it) > distance }.toLong()
     }
 }

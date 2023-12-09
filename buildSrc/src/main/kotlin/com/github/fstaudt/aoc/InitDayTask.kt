@@ -33,10 +33,6 @@ abstract class InitDayTask : DefaultTask() {
     var sessionCookieFile: File = File("cookie.txt")
 
     @Input
-    @Option(description = "use LongDay interface for long results")
-    var long: Boolean = false
-
-    @Input
     @Option(description = "overwrite existing sources")
     var force: Boolean = false
 
@@ -53,19 +49,19 @@ abstract class InitDayTask : DefaultTask() {
                 """
                 package com.github.fstaudt.aoc$year.day$day
 
-                import com.github.fstaudt.aoc$year.shared.${if (long) "Long" else ""}Day
+                import com.github.fstaudt.aoc$year.shared.Day
                 import com.github.fstaudt.aoc$year.shared.readInputLines
 
                 fun main() {
                     Day$day().run()
                 }
 
-                class Day$day(fileName: String = "day_$day.txt") : ${if (long) "Long" else ""}Day {
+                class Day$day(fileName: String = "day_$day.txt") : Day {
                     override val input: List<String> = readInputLines(fileName)
 
-                    override fun part1() = 0${if (long) "L" else ""}
+                    override fun part1() = 0L
 
-                    override fun part2() = 0${if (long) "L" else ""}
+                    override fun part2() = 0L
 
                 }
                 """.trimIndent()

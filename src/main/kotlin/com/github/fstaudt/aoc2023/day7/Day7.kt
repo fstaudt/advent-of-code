@@ -2,14 +2,14 @@ package com.github.fstaudt.aoc2023.day7
 
 import com.github.fstaudt.aoc2023.day7.Day7.Card.CJ
 import com.github.fstaudt.aoc2023.day7.Day7.Type.*
-import com.github.fstaudt.aoc2023.shared.LongDay
+import com.github.fstaudt.aoc2023.shared.Day
 import com.github.fstaudt.aoc2023.shared.readInputLines
 
 fun main() {
     Day7().run()
 }
 
-class Day7(fileName: String = "day_7.txt") : LongDay {
+class Day7(fileName: String = "day_7.txt") : Day {
     override val input: List<String> = readInputLines(fileName)
     private val hands = input.map { it.toHand() }
 
@@ -31,7 +31,7 @@ class Day7(fileName: String = "day_7.txt") : LongDay {
     }
 
     private fun sumWinningsWithJokers(): Long {
-        return hands.sortedWith{ hand1, hand2 ->
+        return hands.sortedWith { hand1, hand2 ->
             val type1 = hand1.typeWithJokers()
             val type2 = hand2.typeWithJokers()
             if (type1 == type2) {

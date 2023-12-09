@@ -1,6 +1,6 @@
 package com.github.fstaudt.aoc2023.day9
 
-import com.github.fstaudt.aoc2023.shared.LongDay
+import com.github.fstaudt.aoc2023.shared.Day
 import com.github.fstaudt.aoc2023.shared.readInputLines
 import com.github.fstaudt.aoc2023.shared.splitLongs
 
@@ -8,7 +8,7 @@ fun main() {
     Day9().run()
 }
 
-class Day9(fileName: String = "day_9.txt") : LongDay {
+class Day9(fileName: String = "day_9.txt") : Day {
     override val input: List<String> = readInputLines(fileName)
     private val values = input.map { it.splitLongs() }
 

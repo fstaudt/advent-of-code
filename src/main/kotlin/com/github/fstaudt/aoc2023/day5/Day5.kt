@@ -1,6 +1,6 @@
 package com.github.fstaudt.aoc2023.day5
 
-import com.github.fstaudt.aoc2023.shared.LongDay
+import com.github.fstaudt.aoc2023.shared.Day
 import com.github.fstaudt.aoc2023.shared.readInputLines
 import com.github.fstaudt.aoc2023.shared.splitLongs
 import com.github.fstaudt.aoc2023.shared.splitNotEmpty
@@ -11,7 +11,7 @@ fun main() {
 }
 
 
-class Day5(fileName: String = "day_5.txt") : LongDay {
+class Day5(fileName: String = "day_5.txt") : Day {
 
     override val input: List<String> = readInputLines(fileName)
     private val seedToSoilMappings = input.toMappings("seed-to-soil")

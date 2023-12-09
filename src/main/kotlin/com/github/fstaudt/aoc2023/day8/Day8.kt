@@ -1,13 +1,13 @@
 package com.github.fstaudt.aoc2023.day8
 
-import com.github.fstaudt.aoc2023.shared.LongDay
+import com.github.fstaudt.aoc2023.shared.Day
 import com.github.fstaudt.aoc2023.shared.readInputLines
 
 fun main() {
     Day8().run()
 }
 
-class Day8(fileName: String = "day_8.txt") : LongDay {
+class Day8(fileName: String = "day_8.txt") : Day {
     companion object {
         private val NODE_REGEX = Regex("([0-9A-Z]+) = \\(([0-9A-Z]+), ([0-9A-Z]+)\\)")
     }
