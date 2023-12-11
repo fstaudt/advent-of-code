@@ -26,7 +26,7 @@ generate a slope chart for a private leaderboard
 - `force`: force download of leaderboard JSON\
   _By default, download is skipped if file `build/aoc/leaderboards/<year>/<id>.json` already exists._\
   :warning: _Please don't make frequent automated requests to Advent of code API._\
-  :warning: _Avoid sending requests more often than once every 15 minutes (900 seconds)._
+  :warning: _Avoid download of leaderboard JSON more often than once every 15 minutes (900 seconds)._
 
 - Slope chart is generated in `build/aoc/leaderboards/<year>/<id>.json.png`
 
