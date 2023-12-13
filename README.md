@@ -2,7 +2,7 @@
 
 ## Solutions
 
-- [2023](src/main/kotlin/com/github/fstaudt/aoc2023)
+- [2023](aoc2023/src/main/kotlin/com/github/fstaudt/aoc2023)
 
 ## Gradle tasks
 

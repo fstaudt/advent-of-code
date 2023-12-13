@@ -13,8 +13,9 @@ import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.message.BasicHeader
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ProjectLayout
-import org.gradle.api.tasks.*
-import org.gradle.api.tasks.PathSensitivity.ABSOLUTE
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.options.Option
 import org.knowm.xchart.BitmapEncoder.BitmapFormat.PNG
 import org.knowm.xchart.BitmapEncoder.saveBitmap
@@ -50,9 +51,8 @@ abstract class LeaderboardSlopeChartTask : DefaultTask() {
     @Option(description = "force download of leaderboard JSON - use wisely!")
     var force: Boolean = false
 
-    @InputFile
-    @PathSensitive(ABSOLUTE)
-    var sessionCookieFile: File = File("cookie.txt")
+    @Input
+    var sessionCookieFile: String = "cookie.txt"
 
     @get:Inject
     protected abstract val layout: ProjectLayout
@@ -64,14 +64,6 @@ abstract class LeaderboardSlopeChartTask : DefaultTask() {
 
     @TaskAction
     fun generateSlopeChart() {
-        if (force) {
-            logger.warn(
-                """
-                Please don't make frequent automated requests to Advent of code API.
-                Avoid sending requests more often than once every 15 minutes (900 seconds).
-                """.trimIndent()
-            )
-        }
         File(layout.buildDirectory.asFile.get(), "aoc/leaderboards/$year").also { leaderboardsDir ->
             leaderboardsDir.mkdirs()
             File(leaderboardsDir, "$id.json").also { leaderboardFile ->
@@ -84,7 +76,13 @@ abstract class LeaderboardSlopeChartTask : DefaultTask() {
     }
 
     private fun input(): String {
-        val cookie = sessionCookieFile.readLines().first { it.isNotBlank() }
+        logger.warn(
+            """
+                Please don't make frequent automated requests to Advent of code API.
+                Avoid sending requests more often than once every 15 minutes (900 seconds).
+                """.trimIndent()
+        )
+        val cookie = File(layout.projectDirectory.asFile, sessionCookieFile).readLines().first { it.isNotBlank() }
         return HttpClientBuilder.create().setDefaultHeaders(listOf(BasicHeader("Cookie", cookie))).build()
             .execute(HttpGet("https://adventofcode.com/$year/leaderboard/private/view/$id.json"))
             .entity.content.readAllBytes().let { String(it) }

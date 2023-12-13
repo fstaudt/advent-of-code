@@ -8,9 +8,6 @@ import org.apache.http.message.BasicHeader
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputFile
-import org.gradle.api.tasks.PathSensitive
-import org.gradle.api.tasks.PathSensitivity.ABSOLUTE
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.options.Option
 import java.io.File
@@ -35,9 +32,8 @@ abstract class FetchDayInputTask : DefaultTask() {
     @Option(description = "year of advent calendar (defaults to current year)")
     var year: String = "${Calendar.getInstance().get(YEAR)}"
 
-    @InputFile
-    @PathSensitive(ABSOLUTE)
-    var sessionCookieFile: File = File("cookie.txt")
+    @Input
+    var sessionCookieFile: String = "cookie.txt"
 
     @get:Inject
     protected abstract val layout: ProjectLayout
@@ -52,7 +48,7 @@ abstract class FetchDayInputTask : DefaultTask() {
     }
 
     private fun input(): String {
-        val cookie = sessionCookieFile.readLines().first { it.isNotBlank() }
+        val cookie = File(project.rootDir, sessionCookieFile).readLines().first { it.isNotBlank() }
         return HttpClientBuilder.create().setDefaultHeaders(listOf(BasicHeader("Cookie", cookie))).build()
             .execute(HttpGet("https://adventofcode.com/$year/day/$day/input"))
             .entity.content.readAllBytes().let { String(it) }
