@@ -48,18 +48,8 @@ class LeaderboardSlopeChartTaskTest {
     @Test
     fun `topMembers should return local daily scores`() {
         val topMembers = leaderboardService.topMembers(leaderboard(owner, player), 2)
-        with(topMembers[0]) {
-            assertThat(localDailyScores).hasSize(3)
-            assertThat(localDailyScores[0]).isEqualTo(4)
-            assertThat(localDailyScores[1]).isEqualTo(8)
-            assertThat(localDailyScores[2]).isEqualTo(12)
-        }
-        with(topMembers[1]) {
-            assertThat(localDailyScores).hasSize(3)
-            assertThat(localDailyScores[0]).isEqualTo(2)
-            assertThat(localDailyScores[1]).isEqualTo(4)
-            assertThat(localDailyScores[2]).isEqualTo(6)
-        }
+        assertThat(topMembers[0].localDailyScores).isEqualTo(listOf(4, 8, 12))
+        assertThat(topMembers[1].localDailyScores).isEqualTo(listOf(2, 4, 6))
     }
 
     @Test
@@ -69,47 +59,34 @@ class LeaderboardSlopeChartTaskTest {
             3 to mapOf(part1(DAY3 + 3)),
         )
         val topMembers = leaderboardService.topMembers(leaderboard(owner, player), 2)
-        with(topMembers[0]) {
-            assertThat(localDailyScores).hasSize(3)
-            assertThat(localDailyScores[0]).isEqualTo(4)
-            assertThat(localDailyScores[1]).isEqualTo(8)
-            assertThat(localDailyScores[2]).isEqualTo(12)
-        }
-        with(topMembers[1]) {
-            assertThat(localDailyScores).hasSize(3)
-            assertThat(localDailyScores[0]).isEqualTo(2)
-            assertThat(localDailyScores[1]).isEqualTo(2)
-            assertThat(localDailyScores[2]).isEqualTo(3)
-        }
+        assertThat(topMembers[0].localDailyScores).isEqualTo(listOf(4, 8, 12))
+        assertThat(topMembers[1].localDailyScores).isEqualTo(listOf(2, 2, 3))
     }
 
     @Test
     fun `topMembers should return local daily scores to 0 for ghost players`() {
         val ghost = member(GHOST_ID, 0)
         val topMembers = leaderboardService.topMembers(leaderboard(owner, player, ghost), 3)
-        with(topMembers[2]) {
-            assertThat(localDailyScores).hasSize(3)
-            assertThat(localDailyScores[0]).isEqualTo(0)
-            assertThat(localDailyScores[1]).isEqualTo(0)
-            assertThat(localDailyScores[2]).isEqualTo(0)
-        }
+        assertThat(topMembers[2].localDailyScores).isEqualTo(listOf(0, 0, 0))
+    }
+
+    @Test
+    fun `topMembers should only increment local daily score for parts completed before EOD`() {
+        val player = member(PLAYER_ID, 3).withCompletionParts(
+            1 to mapOf(part1(DAY1 + 3), part2(DAY1 + 4)),
+            3 to mapOf(part1(DAY3 + 3), part2(DAY3 + 4)),
+            2 to mapOf(part1(DAY3 + 5), part2(DAY3 + 6)),
+        )
+        val topMembers = leaderboardService.topMembers(leaderboard(owner, player), 2)
+        assertThat(topMembers[0].localDailyScores).isEqualTo(listOf(4, 8, 12))
+        assertThat(topMembers[1].localDailyScores).isEqualTo(listOf(2, 2, 6))
     }
 
     @Test
     fun `topMembers should return rankings`() {
         val topMembers = leaderboardService.topMembers(leaderboard(owner, player), 2)
-        with(topMembers[0]) {
-            assertThat(rankings).hasSize(3)
-            assertThat(rankings[0]).isEqualTo(1)
-            assertThat(rankings[1]).isEqualTo(1)
-            assertThat(rankings[2]).isEqualTo(1)
-        }
-        with(topMembers[1]) {
-            assertThat(rankings).hasSize(3)
-            assertThat(rankings[0]).isEqualTo(2)
-            assertThat(rankings[1]).isEqualTo(2)
-            assertThat(rankings[2]).isEqualTo(2)
-        }
+        assertThat(topMembers[0].rankings).isEqualTo(listOf(1, 1, 1))
+        assertThat(topMembers[1].rankings).isEqualTo(listOf(2, 2, 2))
     }
 
     @Test
@@ -126,17 +103,24 @@ class LeaderboardSlopeChartTaskTest {
         )
         val topMembers = leaderboardService.topMembers(leaderboard(owner, player), 1)
         assertThat(topMembers).hasSize(2)
-        with(topMembers[0]) {
-            assertThat(rankings).hasSize(3)
-            assertThat(rankings[0]).isNull()
-            assertThat(rankings[1]).isEqualTo(1)
-            assertThat(rankings[2]).isEqualTo(1)
-        }
-        with(topMembers[1]) {
-            assertThat(rankings).hasSize(3)
-            assertThat(rankings[0]).isEqualTo(1)
-            assertThat(rankings[1]).isNull()
-            assertThat(rankings[2]).isNull()
-        }
+        assertThat(topMembers[0].rankings).isEqualTo(listOf(null, 1, 1))
+        assertThat(topMembers[1].rankings).isEqualTo(listOf(1, null, null))
+    }
+
+    @Test
+    fun `topMembers should return rankings based on local daily score for parts completed before EOD`() {
+        val owner = member(OWNER_ID, 3).withCompletionParts(
+            1 to mapOf(part1(DAY1 + 1), part2(DAY1 + 2)),
+            2 to mapOf(part1(DAY3 + 1), part2(DAY3 + 2)),
+            3 to mapOf(part1(DAY3 + 3), part2(DAY3 + 4)),
+        )
+        val player = member(PLAYER_ID, 3).withCompletionParts(
+            1 to mapOf(part1(DAY2 + 3), part2(DAY2 + 4)),
+            2 to mapOf(part1(DAY2 + 3), part2(DAY2 + 4)),
+            3 to mapOf(part1(DAY3 + 5), part2(DAY3 + 6)),
+        )
+        val topMembers = leaderboardService.topMembers(leaderboard(owner, player), 2)
+        assertThat(topMembers[0].rankings).isEqualTo(listOf(1, 2, 1))
+        assertThat(topMembers[1].rankings).isEqualTo(listOf(2, 1, 2))
     }
 }

@@ -17,7 +17,9 @@ import org.gradle.api.tasks.options.Option
 import org.knowm.xchart.BitmapEncoder.BitmapFormat.PNG
 import org.knowm.xchart.BitmapEncoder.saveBitmap
 import org.knowm.xchart.XYChartBuilder
+import org.knowm.xchart.XYSeries
 import org.knowm.xchart.style.Styler.LegendPosition.OutsideE
+import org.knowm.xchart.style.markers.Marker
 import java.awt.Color.WHITE
 import java.awt.Font
 import java.awt.Font.BOLD
@@ -99,7 +101,7 @@ abstract class LeaderboardSlopeChartTask : DefaultTask() {
             .title("Advent of Code 2023 - private leaderboard of ${leaderboard.owner()} ($id) - top $top")
             .build()
         chart.styler.apply {
-            this.chartTitleFont = Font("SansSerif", BOLD, 24)
+            chartTitleFont = Font("SansSerif", BOLD, 24)
             yAxisMin = top.toDouble()
             yAxisMax = 1.0
             yAxisLeftWidthHint = 20
