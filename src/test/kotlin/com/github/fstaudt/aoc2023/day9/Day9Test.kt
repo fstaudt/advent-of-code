@@ -26,6 +26,6 @@ class Day9Test {
 
     @Test
     fun `part 2 should produce expected result for my input`() {
-        assertThat(Day9().part2()).isEqualTo(0)
+        assertThat(Day9().part2()).isEqualTo(1019)
     }
 }
