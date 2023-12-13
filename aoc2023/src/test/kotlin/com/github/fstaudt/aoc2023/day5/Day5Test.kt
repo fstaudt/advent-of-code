@@ -1,6 +1,7 @@
 package com.github.fstaudt.aoc2023.day5
 
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class Day5Test {

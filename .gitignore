@@ -6,5 +6,5 @@ out/
 target/
 .gradle/
 build/
-src/main/resources
+*/src/main/resources
 cookie.txt

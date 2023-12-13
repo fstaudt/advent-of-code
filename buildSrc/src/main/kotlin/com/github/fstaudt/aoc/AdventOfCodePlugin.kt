@@ -15,7 +15,6 @@ class AdventOfCodePlugin : Plugin<Project> {
         with(project) {
             tasks.register(InitDayTask.NAME, InitDayTask::class.java)
             tasks.register(FetchDayInputTask.NAME, FetchDayInputTask::class.java)
-            tasks.register(LeaderboardSlopeChartTask.NAME, LeaderboardSlopeChartTask::class.java)
         }
     }
 }
