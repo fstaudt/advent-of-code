@@ -14,8 +14,10 @@ dependencies {
     implementation("org.knowm.xchart:xchart:3.8.3")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.15.3")
     api("com.fasterxml.jackson.module:jackson-module-kotlin:2.15.3")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.0")
+    testImplementation("org.assertj:assertj-core:3.24.2")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.0")
 }
-
 
 gradlePlugin {
     plugins {
@@ -24,4 +26,8 @@ gradlePlugin {
             implementationClass = "com.github.fstaudt.aoc.AdventOfCodePlugin"
         }
     }
+}
+
+tasks.test {
+    useJUnitPlatform()
 }

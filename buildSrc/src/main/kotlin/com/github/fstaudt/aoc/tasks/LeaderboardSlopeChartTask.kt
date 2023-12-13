@@ -3,11 +3,8 @@ package com.github.fstaudt.aoc.tasks
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.github.fstaudt.aoc.AdventOfCodePlugin.Companion.GROUP
-import com.github.fstaudt.aoc.model.CompletionDaysLevelsFunctions.day
-import com.github.fstaudt.aoc.model.CompletionPartsFunctions.part1
-import com.github.fstaudt.aoc.model.CompletionPartsFunctions.part2
 import com.github.fstaudt.aoc.model.Leaderboard
-import com.github.fstaudt.aoc.model.Member
+import com.github.fstaudt.aoc.service.LeaderboardService
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.message.BasicHeader
@@ -62,6 +59,9 @@ abstract class LeaderboardSlopeChartTask : DefaultTask() {
         it.registerModule(KotlinModule.Builder().build())
     }
 
+    @Internal
+    protected val leaderboardService = LeaderboardService()
+
     @TaskAction
     fun generateSlopeChart() {
         File(layout.buildDirectory.asFile.get(), "aoc/leaderboards/$year").also { leaderboardsDir ->
@@ -90,7 +90,7 @@ abstract class LeaderboardSlopeChartTask : DefaultTask() {
 
     private fun generateSlopeChartFor(leaderboardFile: File) {
         val leaderboard = jsonMapper.readValue(leaderboardFile, Leaderboard::class.java)
-        val members = leaderboard.toTopMembers()
+        val members = leaderboardService.topMembers(leaderboard, top.toInt())
         val numberOfDays = leaderboard.numberOfDays()
 
         val chart = XYChartBuilder()
@@ -115,40 +115,5 @@ abstract class LeaderboardSlopeChartTask : DefaultTask() {
         }
         members.forEach { chart.addSeries("${it.localScore} - ${it.name()}", (1..numberOfDays).toList(), it.rankings) }
         saveBitmap(chart, leaderboardFile.canonicalPath, PNG)
-    }
-
-    private fun Leaderboard.toTopMembers(): List<Member> {
-        for (day in 0..<numberOfDays()) {
-            sortedBy { it.completionDayLevels.day(day)?.part1() }.let { members ->
-                members.forEachIndexed { index, member ->
-                    val previousDailyScore = if (day > 0) member.localDailyScores[day - 1] else 0
-                    if (member.completionDayLevels.day(day)?.part1() != null) {
-                        previousDailyScore + members.size - index
-                    } else {
-                        previousDailyScore
-                    }.let { member.localDailyScores.add(it) }
-                }
-            }
-            sortedBy { it.completionDayLevels.day(day)?.part2() }.let { members ->
-                members.forEachIndexed { index, member ->
-                    if (member.completionDayLevels.day(day)?.part2() != null) {
-                        member.localDailyScores[day] += members.size - index
-                    }
-                }
-            }
-            members.values.sortedWith(
-                compareByDescending<Member> { it.localDailyScores[day] }
-                    .thenBy { it.completionDayLevels.day(day)?.part2()?.starIndex ?: Int.MAX_VALUE }
-                    .thenBy { it.completionDayLevels.day(day)?.part1()?.starIndex ?: Int.MAX_VALUE }
-            ).let { members ->
-                members.forEachIndexed { index, member ->
-                    member.rankings.add((index + 1).takeIf { it <= top.toInt() })
-                }
-            }
-        }
-
-        return members.values
-            .sortedWith(compareByDescending<Member> { it.localScore }.thenBy { it.lastStarTimestamp })
-            .filter { member -> member.rankings.any { it != null } }
     }
 }
