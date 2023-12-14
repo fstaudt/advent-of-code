@@ -1,8 +1,8 @@
 package com.github.fstaudt.aoc2023.day13
 
-import com.github.fstaudt.aoc2023.shared.Day
-import com.github.fstaudt.aoc2023.shared.flip
-import com.github.fstaudt.aoc2023.shared.readInputLines
+import com.github.fstaudt.aoc.shared.Day
+import com.github.fstaudt.aoc.shared.StringExtensions.flip
+import com.github.fstaudt.aoc.shared.Input.readInputLines
 import kotlin.math.min
 
 fun main() {
@@ -47,6 +47,7 @@ class Day13(fileName: String = "day_13.txt") : Day {
             }.count()
         }.sumOf { it }
     }
+
     data class Pattern(val lines: List<String>) {
         fun flip() = Pattern(lines.flip())
         override fun toString() = "Pattern[\n${lines.joinToString("\n")}\n]"

@@ -47,8 +47,8 @@ abstract class InitDayTask : DefaultTask() {
                 """
                 package com.github.fstaudt.aoc$year.day$day
 
-                import com.github.fstaudt.aoc$year.shared.Day
-                import com.github.fstaudt.aoc$year.shared.readInputLines
+                import com.github.fstaudt.aoc.shared.Day
+                import com.github.fstaudt.aoc.shared.Input.readInputLines
 
                 fun main() {
                     Day$day().run()
@@ -79,24 +79,19 @@ abstract class InitDayTask : DefaultTask() {
                 import org.junit.jupiter.api.Test
                 
                 class Day${day}Test {
-                
-                    companion object {
-                        private const val EXAMPLE = "example_day$day.txt"
-                    }
-                
                     @Test
                     fun `part 1 should produce expected result for example`() {
-                        assertThat(Day$day(EXAMPLE).part1()).isEqualTo(0)
-                    }
-                
-                    @Test
-                    fun `part 2 should produce expected result for example`() {
-                        assertThat(Day$day(EXAMPLE).part2()).isEqualTo(0)
+                        assertThat(Day$day("example_day$day.txt").part1()).isEqualTo(0)
                     }
                 
                     @Test
                     fun `part 1 should produce expected result for my input`() {
                         assertThat(Day$day().part1()).isEqualTo(0)
+                    }
+                
+                    @Test
+                    fun `part 2 should produce expected result for example`() {
+                        assertThat(Day$day("example_day$day.txt").part2()).isEqualTo(0)
                     }
                 
                     @Test

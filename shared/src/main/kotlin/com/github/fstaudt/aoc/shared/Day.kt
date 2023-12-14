@@ -1,4 +1,4 @@
-package com.github.fstaudt.aoc2023.shared
+package com.github.fstaudt.aoc.shared
 
 interface Day {
 

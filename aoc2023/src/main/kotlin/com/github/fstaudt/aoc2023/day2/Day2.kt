@@ -1,7 +1,7 @@
 package com.github.fstaudt.aoc2023.day2
 
-import com.github.fstaudt.aoc2023.shared.Day
-import com.github.fstaudt.aoc2023.shared.readInputLines
+import com.github.fstaudt.aoc.shared.Day
+import com.github.fstaudt.aoc.shared.Input.readInputLines
 import kotlin.math.max
 
 fun main() {

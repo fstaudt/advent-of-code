@@ -1,2 +1,2 @@
 rootProject.name = "advent-of-code"
-include("aoc2023")
+include("shared", "aoc2023")

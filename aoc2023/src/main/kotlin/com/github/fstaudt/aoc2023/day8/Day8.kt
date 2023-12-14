@@ -1,7 +1,7 @@
 package com.github.fstaudt.aoc2023.day8
 
-import com.github.fstaudt.aoc2023.shared.Day
-import com.github.fstaudt.aoc2023.shared.readInputLines
+import com.github.fstaudt.aoc.shared.Day
+import com.github.fstaudt.aoc.shared.Input.readInputLines
 
 fun main() {
     Day8().run()

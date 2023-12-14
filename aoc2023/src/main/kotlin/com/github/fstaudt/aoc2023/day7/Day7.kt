@@ -1,9 +1,9 @@
 package com.github.fstaudt.aoc2023.day7
 
+import com.github.fstaudt.aoc.shared.Day
+import com.github.fstaudt.aoc.shared.Input.readInputLines
 import com.github.fstaudt.aoc2023.day7.Day7.Card.CJ
 import com.github.fstaudt.aoc2023.day7.Day7.Type.*
-import com.github.fstaudt.aoc2023.shared.Day
-import com.github.fstaudt.aoc2023.shared.readInputLines
 
 fun main() {
     Day7().run()
