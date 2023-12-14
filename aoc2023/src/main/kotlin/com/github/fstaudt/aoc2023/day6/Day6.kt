@@ -1,9 +1,9 @@
 package com.github.fstaudt.aoc2023.day6
 
-import com.github.fstaudt.aoc2023.shared.Day
-import com.github.fstaudt.aoc2023.shared.readInputLines
-import com.github.fstaudt.aoc2023.shared.splitLongs
-import com.github.fstaudt.aoc2023.shared.toGroupValue
+import com.github.fstaudt.aoc.shared.Day
+import com.github.fstaudt.aoc.shared.StringExtensions.splitLongs
+import com.github.fstaudt.aoc.shared.StringExtensions.toGroupValue
+import com.github.fstaudt.aoc.shared.Input.readInputLines
 
 fun main() {
     Day6().run()

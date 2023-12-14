@@ -4,7 +4,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 class Day13Test {
-
     @Test
     fun `part 1 should produce expected result for example`() {
         assertThat(Day13("example_day13.txt").part1()).isEqualTo(405)

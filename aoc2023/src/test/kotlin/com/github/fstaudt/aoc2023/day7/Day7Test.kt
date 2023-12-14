@@ -5,24 +5,19 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 class Day7Test {
-
-    companion object {
-        private const val EXAMPLE = "example_day7.txt"
-    }
-
     @Test
     fun `part 1 should produce expected result for example`() {
-        assertThat(Day7(EXAMPLE).part1()).isEqualTo(6440)
-    }
-
-    @Test
-    fun `part 2 should produce expected result for example`() {
-        assertThat(Day7(EXAMPLE).part2()).isEqualTo(5905)
+        assertThat(Day7("example_day7.txt").part1()).isEqualTo(6440)
     }
 
     @Test
     fun `part 1 should produce expected result for my input`() {
         assertThat(Day7().part1()).isEqualTo(253933213)
+    }
+
+    @Test
+    fun `part 2 should produce expected result for example`() {
+        assertThat(Day7("example_day7.txt").part2()).isEqualTo(5905)
     }
 
     @Test

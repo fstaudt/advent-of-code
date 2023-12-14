@@ -1,10 +1,10 @@
 package com.github.fstaudt.aoc2023.day14
 
+import com.github.fstaudt.aoc.shared.Day
+import com.github.fstaudt.aoc.shared.MatrixExtensions.flipMatrix
+import com.github.fstaudt.aoc.shared.MatrixExtensions.tiltClockwise
+import com.github.fstaudt.aoc.shared.Input.readInputLines
 import com.github.fstaudt.aoc2023.day14.Day14.Type.*
-import com.github.fstaudt.aoc2023.shared.Day
-import com.github.fstaudt.aoc2023.shared.MatrixExtensions.flipMatrix
-import com.github.fstaudt.aoc2023.shared.MatrixExtensions.tiltClockwise
-import com.github.fstaudt.aoc2023.shared.readInputLines
 
 fun main() {
     Day14().run()

@@ -1,9 +1,9 @@
 package com.github.fstaudt.aoc2023.day10
 
+import com.github.fstaudt.aoc.shared.Day
+import com.github.fstaudt.aoc.shared.Input.readInputLines
 import com.github.fstaudt.aoc2023.day10.Day10.Pipe.*
 import com.github.fstaudt.aoc2023.day10.Day10.Tile
-import com.github.fstaudt.aoc2023.shared.Day
-import com.github.fstaudt.aoc2023.shared.readInputLines
 
 fun main() {
     Day10().run()

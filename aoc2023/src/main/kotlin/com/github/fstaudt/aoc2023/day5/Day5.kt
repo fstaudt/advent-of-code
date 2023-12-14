@@ -1,9 +1,9 @@
 package com.github.fstaudt.aoc2023.day5
 
-import com.github.fstaudt.aoc2023.shared.Day
-import com.github.fstaudt.aoc2023.shared.readInputLines
-import com.github.fstaudt.aoc2023.shared.splitLongs
-import com.github.fstaudt.aoc2023.shared.splitNotEmpty
+import com.github.fstaudt.aoc.shared.Day
+import com.github.fstaudt.aoc.shared.StringExtensions.splitLongs
+import com.github.fstaudt.aoc.shared.StringExtensions.splitNotEmpty
+import com.github.fstaudt.aoc.shared.Input.readInputLines
 import kotlin.math.min
 
 fun main() {
