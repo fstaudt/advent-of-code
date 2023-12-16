@@ -53,6 +53,10 @@ abstract class LeaderboardSlopeChartTask : DefaultTask() {
     var until: String = "25"
 
     @Input
+    @Option(description = "minimum number of appearances in top for members not in top on last day")
+    var min: String = "2"
+
+    @Input
     @Option(description = "force download of leaderboard JSON - use wisely!")
     var force: Boolean = false
 
@@ -98,7 +102,7 @@ abstract class LeaderboardSlopeChartTask : DefaultTask() {
 
     private fun generateSlopeChartFor(leaderboardFile: File) {
         val leaderboard = jsonMapper.readValue(leaderboardFile, Leaderboard::class.java)
-        val members = leaderboardService.topMembers(leaderboard, top.toInt(), until.toInt())
+        val members = leaderboardService.topMembers(leaderboard, top.toInt(), until.toInt(), min.toInt())
         val firstDay = runCatching { from.toInt() }.getOrElse { 1 }
         val lastDay = runCatching { until.toInt() }.getOrElse { 25 }.coerceAtMost(leaderboard.numberOfDays())
         val numberOfDays = lastDay - firstDay + 1
@@ -125,8 +129,8 @@ abstract class LeaderboardSlopeChartTask : DefaultTask() {
         }
         val days = (firstDay..lastDay).toList()
         members.forEach {
-            val rankings = it.rankings.drop(firstDay-1).take(numberOfDays)
-            chart.addSeries("${it.localDailyScores[lastDay-1]} - ${it.name()}", days, rankings)
+            val rankings = it.rankings.drop(firstDay - 1).take(numberOfDays)
+            chart.addSeries("${it.localDailyScores[lastDay - 1]} - ${it.name()}", days, rankings)
         }
         saveBitmap(chart, leaderboardFile.canonicalPath, PNG)
     }

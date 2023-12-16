@@ -3,6 +3,8 @@ package com.github.fstaudt.aoc.service
 import com.github.fstaudt.aoc.TestData.DAY1
 import com.github.fstaudt.aoc.TestData.DAY2
 import com.github.fstaudt.aoc.TestData.DAY3
+import com.github.fstaudt.aoc.TestData.DAY4
+import com.github.fstaudt.aoc.TestData.DAY5
 import com.github.fstaudt.aoc.TestData.GHOST_ID
 import com.github.fstaudt.aoc.TestData.OWNER_ID
 import com.github.fstaudt.aoc.TestData.PLAYER_ID
@@ -43,6 +45,32 @@ class LeaderboardSlopeChartTaskTest {
         assertThat(topMembers).hasSize(2)
         assertThat(topMembers[0].id).isEqualTo(OWNER_ID)
         assertThat(topMembers[1].id).isEqualTo(PLAYER_ID)
+    }
+
+    @Test
+    fun `topMembers should not return members that did not appear enought times in top`() {
+        val owner = member(OWNER_ID, 10).withCompletionParts(
+            1 to mapOf(part1(DAY1 + 5), part2(DAY1 + 6)),
+            2 to mapOf(part1(DAY2 + 1), part2(DAY2 + 2)),
+            3 to mapOf(part1(DAY3 + 3), part2(DAY3 + 4)),
+            4 to mapOf(part1(DAY4 + 1), part2(DAY4 + 2)),
+            5 to mapOf(part1(DAY5 + 1), part2(DAY5 + 2)),
+        )
+        val player = member(PLAYER_ID, 8).withCompletionParts(
+            1 to mapOf(part1(DAY1 + 3), part2(DAY1 + 4)),
+            2 to mapOf(part1(DAY2 + 3), part2(DAY2 + 4)),
+            3 to mapOf(part1(DAY3 + 1), part2(DAY3 + 2)),
+            4 to mapOf(part1(DAY4 + 3), part2(DAY4 + 4)),
+            5 to mapOf(part1(DAY5 + 3), part2(DAY5 + 4)),
+        )
+        val topOnFirstDay = member(GHOST_ID, 3).withCompletionParts(
+            1 to mapOf(part1(DAY1 + 1), part2(DAY1 + 2))
+        )
+
+        val topMembers = leaderboardService.topMembers(leaderboard(owner, player, topOnFirstDay), 2, min = 2)
+        assertThat(topMembers).hasSize(2)
+        assertThat(topMembers[0].rankings).isEqualTo(listOf(null, 1, 2, 1, 1))
+        assertThat(topMembers[1].rankings).isEqualTo(listOf(2, 2, 1, 2, 2))
     }
 
     @Test
@@ -102,9 +130,8 @@ class LeaderboardSlopeChartTaskTest {
             3 to mapOf(part1(DAY3 + 3), part2(DAY3 + 4)),
         )
         val topMembers = leaderboardService.topMembers(leaderboard(owner, player), 1)
-        assertThat(topMembers).hasSize(2)
+        assertThat(topMembers).hasSize(1)
         assertThat(topMembers[0].rankings).isEqualTo(listOf(null, 1, 1))
-        assertThat(topMembers[1].rankings).isEqualTo(listOf(1, null, null))
     }
 
     @Test
