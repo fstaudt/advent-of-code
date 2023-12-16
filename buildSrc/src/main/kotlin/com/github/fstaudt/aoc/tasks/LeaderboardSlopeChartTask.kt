@@ -17,9 +17,7 @@ import org.gradle.api.tasks.options.Option
 import org.knowm.xchart.BitmapEncoder.BitmapFormat.PNG
 import org.knowm.xchart.BitmapEncoder.saveBitmap
 import org.knowm.xchart.XYChartBuilder
-import org.knowm.xchart.XYSeries
 import org.knowm.xchart.style.Styler.LegendPosition.OutsideE
-import org.knowm.xchart.style.markers.Marker
 import java.awt.Color.WHITE
 import java.awt.Font
 import java.awt.Font.BOLD
@@ -45,6 +43,14 @@ abstract class LeaderboardSlopeChartTask : DefaultTask() {
     @Input
     @Option(description = "number of top members displayed in slope chart")
     var top: String = "20"
+
+    @Input
+    @Option(description = "first day displayed in slope chart")
+    var from: String = "1"
+
+    @Input
+    @Option(description = "last day displayed in slope chart")
+    var until: String = "25"
 
     @Input
     @Option(description = "force download of leaderboard JSON - use wisely!")
@@ -92,8 +98,10 @@ abstract class LeaderboardSlopeChartTask : DefaultTask() {
 
     private fun generateSlopeChartFor(leaderboardFile: File) {
         val leaderboard = jsonMapper.readValue(leaderboardFile, Leaderboard::class.java)
-        val members = leaderboardService.topMembers(leaderboard, top.toInt())
-        val numberOfDays = leaderboard.numberOfDays()
+        val members = leaderboardService.topMembers(leaderboard, top.toInt(), until.toInt())
+        val firstDay = runCatching { from.toInt() }.getOrElse { 1 }
+        val lastDay = runCatching { until.toInt() }.getOrElse { 25 }.coerceAtMost(leaderboard.numberOfDays())
+        val numberOfDays = lastDay - firstDay + 1
 
         val chart = XYChartBuilder()
             .width(numberOfDays * 150 + 200).height(members.size * 30)
@@ -115,7 +123,11 @@ abstract class LeaderboardSlopeChartTask : DefaultTask() {
             xAxisTickMarksColor = WHITE
             yAxisTickMarksColor = WHITE
         }
-        members.forEach { chart.addSeries("${it.localScore} - ${it.name()}", (1..numberOfDays).toList(), it.rankings) }
+        val days = (firstDay..lastDay).toList()
+        members.forEach {
+            val rankings = it.rankings.drop(firstDay-1).take(numberOfDays)
+            chart.addSeries("${it.localDailyScores[lastDay-1]} - ${it.name()}", days, rankings)
+        }
         saveBitmap(chart, leaderboardFile.canonicalPath, PNG)
     }
 }
