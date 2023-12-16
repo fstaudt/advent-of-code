@@ -9,7 +9,12 @@ import kotlin.Int.Companion.MAX_VALUE
 
 class LeaderboardService {
 
-    fun topMembers(leaderboard: Leaderboard, top: Int, until: Int = leaderboard.numberOfDays()): List<Member> {
+    fun topMembers(
+        leaderboard: Leaderboard,
+        top: Int,
+        until: Int = leaderboard.numberOfDays(),
+        min: Int = 1,
+    ): List<Member> {
         leaderboard.computeLocalDailyScores(until)
         for (day in 0..<until) {
             leaderboard.members.values.sortedWith(
@@ -24,7 +29,7 @@ class LeaderboardService {
         }
         return leaderboard.members.values
             .sortedWith(compareByDescending<Member> { it.localDailyScores[until - 1] }.thenBy { it.lastStarTimestamp })
-            .filter { member -> member.rankings.any { it != null } }
+            .filterIndexed { index, member -> index < top || member.rankings.count { it != null } > min }
     }
 
     private fun Leaderboard.computeLocalDailyScores(until: Int) {
