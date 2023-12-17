@@ -53,7 +53,7 @@ abstract class LeaderboardSlopeChartTask : DefaultTask() {
     var until: String = "25"
 
     @Input
-    @Option(description = "minimum number of appearances in top for members not in top on last day")
+    @Option(description = "minimum required number of appearances in top for members not in top on last day")
     var min: String = "2"
 
     @Input
