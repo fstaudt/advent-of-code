@@ -18,7 +18,8 @@ generate a slope chart for a private leaderboard
 
 - run command:
 ``` shell
-./gradlew leaderboardSlopeChart --year=<year> --id=<leaderboard-id> [--top=<top>] [--force]
+./gradlew leaderboardSlopeChart --year=<year> --id=<leaderboard-id> [--top=<top>] [--force] \
+   [--from=<from>] [--until=<until>] 
 ```
 - `year`: year of advent calendar
 - `id`: ID of private leaderboard
@@ -27,6 +28,9 @@ generate a slope chart for a private leaderboard
   _By default, download is skipped if file `build/aoc/leaderboards/<year>/<id>.json` already exists._\
   :warning: _Please don't make frequent automated requests to Advent of code API._\
   :warning: _Avoid download of leaderboard JSON more often than once every 15 minutes (900 seconds)._
+- `from`: first day displayed in slope chart (default: 1)
+- `until`: last day displayed in slope chart (default: 25)
+- `min`: minimum required number of appearances in top for members not in top on last day (default: 2)
 
 - Slope chart is generated in `build/aoc/leaderboards/<year>/<id>.json.png`
 
