@@ -14,78 +14,132 @@ class Day18(fileName: String = "day_18.txt") : Day {
 
     override fun part1() = countLagoonSize()
 
-    override fun part2() = 0L
+    override fun part2() = countLagoonSizeWithColors()
 
     private fun countLagoonSize(): Long {
         val digs = input.map { line ->
-            line.split(" ").let { Dig(Direction.of(it[0].first()), it[1].toInt(), it[2]) }
+            line.split(" ").let { Dig(Direction.of(it[0].first()), it[1].toInt()) }
         }
-        var currentSpot = Spot(0, 0, true)
-        val terrain = mutableMapOf<Int, MutableMap<Int, Spot>>()
-        (terrain[0] ?: mutableMapOf<Int, Spot>().also { terrain[0] = it })[0] = currentSpot
+        return countLagoonSizeFor(digs)
+    }
+
+    private fun countLagoonSizeWithColors(): Long {
+        val digs = input.map { line ->
+            line.split(" ")[2].let {
+                Dig(Direction.entries[it[7].digitToInt()], it.substring(1, 7).toHexa())
+            }
+        }
+        return countLagoonSizeFor(digs)
+    }
+
+    fun countLagoonSizeFor(digs: List<Dig>): Long {
+        var currentSpot = Spot(0, 0)
+        val terrain = mutableMapOf<Long, MutableMap<Long, Spot>>()
+        val flipped = mutableMapOf<Long, MutableMap<Long, Spot>>()
+        (terrain[0] ?: mutableMapOf<Long, Spot>().also { terrain[0L] = it })[0L] = currentSpot
+        (flipped[0] ?: mutableMapOf<Long, Spot>().also { flipped[0L] = it })[0L] = currentSpot
         digs.forEach { dig ->
-            for (i in 1..dig.size) {
-                val lineKey = currentSpot.line + dig.direction.lineDiff
-                val columnKey = currentSpot.column + dig.direction.columnDiff
-                val line = terrain[lineKey] ?: mutableMapOf<Int, Spot>().also { terrain[lineKey] = it }
-                val spot = line[columnKey] ?: Spot(lineKey, columnKey).also { line[columnKey] = it }
-                spot.trench = true
-                currentSpot = spot
+            currentSpot.directions += dig.direction
+            val lineKey = currentSpot.line + dig.size * dig.direction.lineDiff
+            val columnKey = currentSpot.column + dig.size * dig.direction.columnDiff
+
+            currentSpot = (terrain[lineKey]?.get(columnKey) ?: Spot(lineKey, columnKey)).also {
+                it.directions += dig.direction.backward()
             }
+            (terrain[lineKey] ?: mutableMapOf<Long, Spot>().also { terrain[lineKey] = it })[columnKey] = currentSpot
+            (flipped[columnKey] ?: mutableMapOf<Long, Spot>().also { flipped[columnKey] = it })[lineKey] = currentSpot
         }
-        val minColumn = terrain.values.flatMap { it.keys }.min()
-        val maxColumn = terrain.values.flatMap { it.keys }.max()
-        for (i in terrain.keys) {
-            val line = terrain[i]!!
-            for (j in (minColumn..maxColumn)) {
-                line[j] ?: Spot(i, j).also { line[j] = it }
+        val lineIndices = terrain.keys.sorted()
+        var sum = 0L
+        terrain[lineIndices[0]]!!.keys.chunked(2).forEach { sum += it[1] - it[0] + 1 }
+        var previousLineIndex = lineIndices[0]
+        for (lineIndex in lineIndices.drop(1)) {
+            // previous intermediate lines
+            if (previousLineIndex != lineIndex - 1) {
+                flipped.values.sortedBy { it.values.first().column }.flatMap { col ->
+                    col.entries.sortedBy { it.key }.chunked(2)
+                        .filter { it[0].key < lineIndex - 1 && lineIndex - 1 < it[1].key }.map { it[0].value.column }
+                }.chunked(2).forEach {
+                    sum += (it[1] - it[0] + 1) * (lineIndex - previousLineIndex - 1)
+                }
             }
-        }
-        for (i in terrain.keys.sorted()) {
+            previousLineIndex = lineIndex
+            // current line
             var lagoon = false
             var trenchDirection: Direction? = null
-            for (j in (minColumn..maxColumn)) {
-                terrain[i]!![j]!!.lagoon = lagoon || terrain[i]!![j]!!.trench
-                if (terrain[i]!![j]!!.trench) {
-                    if (terrain[i]!![j - 1]?.trench != true) {
-                        if (terrain[i - 1]?.get(j)?.trench != true) {
-                            trenchDirection = DOWN
-                        } else if (terrain[i + 1]?.get(j)?.trench != true) {
-                            trenchDirection = UP
-                        } else {
-                            lagoon = !lagoon
+            var start: Long? = null
+            (flipped.values.sortedBy { it.values.first().column }.flatMap { col ->
+                col.entries.sortedBy { it.key }.chunked(2)
+                    .filter { it[0].key < lineIndex && lineIndex < it[1].key }.map { it[0].value }
+            } + terrain[lineIndex]!!.values).sortedBy { it.column }.forEach { spot ->
+                when {
+                    spot.line != lineIndex -> {
+                        if (lagoon) {
+                            sum += spot.column - (start!!) + 1
+                            start = null
+                        } else start = spot.column
+                        lagoon = !lagoon
+                    }
+
+                    trenchDirection == null -> {
+                        trenchDirection = spot.directions.first { it == UP || it == DOWN }
+                        start = start ?: spot.column
+                    }
+
+                    trenchDirection == spot.directions.first { it == UP || it == DOWN } -> {
+                        if (!lagoon) {
+                            sum += spot.column - (start!!) + 1
+                            start = null
                         }
-                    } else {
-                        if (terrain[i - 1]?.get(j)?.trench == true) {
-                            if (trenchDirection == DOWN) {
-                                lagoon = !lagoon
-                            }
-                            trenchDirection = null
-                        } else if (terrain[i + 1]?.get(j)?.trench == true) {
-                            if (trenchDirection == UP) {
-                                lagoon = !lagoon
-                            }
-                            trenchDirection = null
+                        trenchDirection = null
+                    }
+
+                    else -> {
+                        trenchDirection = null
+                        if (lagoon) {
+                            sum += spot.column - (start!!) + 1
+                            start = null
                         }
+                        lagoon = !lagoon
                     }
                 }
             }
         }
-        return terrain.values.sumOf { line -> line.values.count { it.lagoon }.toLong() }
+        return sum
     }
 
-    private enum class Direction(val char: Char, val lineDiff: Int, val columnDiff: Int) {
-        UP('U', -1, 0),
-        DOWN('D', 1, 0),
+    private fun String.toHexa() = fold(0) { hexa, c -> hexa * 16 + c.toHexa() }
+
+    private fun Char.toHexa() = when (this) {
+        '1', '2', '3', '4', '5', '6', '7', '8', '9' -> digitToInt()
+        'a' -> 10
+        'b' -> 11
+        'c' -> 12
+        'd' -> 13
+        'e' -> 14
+        'f' -> 15
+        else -> 0
+    }
+
+    enum class Direction(val char: Char, val lineDiff: Int, val columnDiff: Int) {
         RIGHT('R', 0, 1),
+        DOWN('D', 1, 0),
         LEFT('L', 0, -1),
+        UP('U', -1, 0),
         ;
+
+        fun backward() = when (this) {
+            RIGHT -> LEFT
+            DOWN -> UP
+            LEFT -> RIGHT
+            UP -> DOWN
+        }
 
         companion object {
             fun of(char: Char) = Direction.entries.first { it.char == char }
         }
     }
 
-    private data class Dig(val direction: Direction, val size: Int, val color: String)
-    private data class Spot(val line: Int, val column: Int, var trench: Boolean = false, var lagoon: Boolean = false)
+    data class Dig(val direction: Direction, val size: Int)
+    private data class Spot(val line: Long, val column: Long, val directions: MutableSet<Direction> = mutableSetOf())
 }
