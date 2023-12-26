@@ -79,10 +79,10 @@ class Day7(fileName: String = "day_7.txt") : Day {
             return when {
                 cards.all { it == cards[0] } -> FIVE_OF_A_KIND
                 cards.groupBy { it }.values.maxOf { it.size } == 4 -> FOUR_OF_A_KIND
-                cards.groupBy { it }.values.let { it.maxOf { it.size } == 3 && it.size == 2 } -> FULL_HOUSE
+                cards.groupBy { it }.values.let { group -> group.maxOf { it.size } == 3 && group.size == 2 } -> FULL_HOUSE
                 cards.groupBy { it }.values.maxOf { it.size } == 3 -> THREE_OF_A_KIND
-                cards.groupBy { it }.values.let { it.count { it.size == 2 } == 2 } -> TWO_PAIRS
-                cards.groupBy { it }.values.let { it.count { it.size == 2 } == 1 } -> ONE_PAIR
+                cards.groupBy { it }.values.let { group -> group.count { it.size == 2 } == 2 } -> TWO_PAIRS
+                cards.groupBy { it }.values.let { group -> group.count { it.size == 2 } == 1 } -> ONE_PAIR
                 else -> HIGH_CARD
             }
         }
