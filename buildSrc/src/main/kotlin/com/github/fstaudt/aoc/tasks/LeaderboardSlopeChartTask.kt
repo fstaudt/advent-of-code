@@ -53,6 +53,10 @@ abstract class LeaderboardSlopeChartTask : DefaultTask() {
     var until: String = "25"
 
     @Input
+    @Option(description = "include final ranking in slope chart")
+    var final: Boolean = true
+
+    @Input
     @Option(description = "minimum required number of appearances in top for members not in top on last day")
     var min: String = "2"
 
@@ -102,13 +106,12 @@ abstract class LeaderboardSlopeChartTask : DefaultTask() {
 
     private fun generateSlopeChartFor(leaderboardFile: File) {
         val leaderboard = jsonMapper.readValue(leaderboardFile, Leaderboard::class.java)
-        val members = leaderboardService.topMembers(leaderboard, top.toInt(), until.toInt(), min.toInt())
+        val members = leaderboardService.topMembers(leaderboard, top.toInt(), until.toInt(), min.toInt(), final)
         val firstDay = runCatching { from.toInt() }.getOrElse { 1 }
         val lastDay = runCatching { until.toInt() }.getOrElse { 25 }.coerceAtMost(leaderboard.numberOfDays())
         val numberOfDays = lastDay - firstDay + 1
-
         val chart = XYChartBuilder()
-            .width(numberOfDays * 150 + 200).height(members.size * 30)
+            .width((numberOfDays + (if (final) 1 else 0)) * 120 + 150).height(members.size * 30)
             .xAxisTitle("Day")
             .title("Advent of Code 2023 - private leaderboard of ${leaderboard.owner()} ($id) - top $top")
             .build()
@@ -125,12 +128,17 @@ abstract class LeaderboardSlopeChartTask : DefaultTask() {
             legendBackgroundColor = WHITE
             legendBorderColor = WHITE
             xAxisTickMarksColor = WHITE
+            setxAxisTickLabelsFormattingFunction { if (it > 25) "*" else "${it.toInt()}" }
             yAxisTickMarksColor = WHITE
         }
-        val days = (firstDay..lastDay).toList()
-        members.forEach {
-            val rankings = it.rankings.drop(firstDay - 1).take(numberOfDays)
-            chart.addSeries("${it.localDailyScores[lastDay - 1]} - ${it.name()}", days, rankings)
+        val days = (firstDay..lastDay).toList() + (if (final) listOf(26) else emptyList())
+        members.forEachIndexed { index, member ->
+            val rankings = member.rankings.drop(firstDay - 1).take(numberOfDays).toMutableList().also {
+                if (final) it += member.rankings.last()
+            }
+            val name =
+                "${index + 1} - ${member.name()} (${if (final) member.localScore else member.localDailyScores[lastDay - 1]})"
+            chart.addSeries(name, days, rankings)
         }
         saveBitmap(chart, leaderboardFile.canonicalPath, PNG)
     }

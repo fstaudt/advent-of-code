@@ -150,4 +150,21 @@ class LeaderboardSlopeChartTaskTest {
         assertThat(topMembers[0].rankings).isEqualTo(listOf(1, 2, 1))
         assertThat(topMembers[1].rankings).isEqualTo(listOf(2, 1, 2))
     }
+
+    @Test
+    fun `topMembers should return extra ranking based on current local score when final is true`() {
+        val owner = member(OWNER_ID, 5).withCompletionParts(
+            1 to mapOf(part1(DAY1 + 1), part2(DAY1 + 2)),
+            2 to mapOf(part1(DAY3 + 1), part2(DAY3 + 2)),
+            3 to mapOf(part1(DAY3 + 3), part2(DAY3 + 4)),
+        )
+        val player = member(PLAYER_ID, 3).withCompletionParts(
+            1 to mapOf(part1(DAY2 + 3), part2(DAY2 + 4)),
+            2 to mapOf(part1(DAY2 + 3), part2(DAY2 + 4)),
+            3 to mapOf(part1(DAY3 + 5), part2(DAY3 + 6)),
+        )
+        val topMembers = leaderboardService.topMembers(leaderboard(owner, player), 2, 2, final = true)
+        assertThat(topMembers[0].rankings).isEqualTo(listOf(1, 2, 1))
+        assertThat(topMembers[1].rankings).isEqualTo(listOf(2, 1, 2))
+    }
 }

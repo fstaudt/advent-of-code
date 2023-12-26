@@ -14,6 +14,7 @@ class LeaderboardService {
         top: Int,
         until: Int = leaderboard.numberOfDays(),
         min: Int = 1,
+        final: Boolean = false,
     ): List<Member> {
         leaderboard.computeLocalDailyScores(until)
         for (day in 0..<until) {
@@ -27,9 +28,21 @@ class LeaderboardService {
                 }
             }
         }
-        return leaderboard.members.values
-            .sortedWith(compareByDescending<Member> { it.localDailyScores[until - 1] }.thenBy { it.lastStarTimestamp })
-            .filterIndexed { index, member -> index < top || member.rankings.count { it != null } > min }
+        if (final) {
+            leaderboard.members.values.sortedWith(
+                compareByDescending<Member> { it.localScore }.thenByDescending { it.lastStarTimestamp }
+            ).let { members ->
+                members.forEachIndexed { index, member ->
+                    member.rankings.add((index + 1).takeIf { it <= top })
+                }
+            }
+        }
+        return leaderboard.members.values.sortedWith(
+            if (final)
+                compareByDescending<Member> { it.localScore }.thenByDescending { it.lastStarTimestamp }
+            else
+                compareByDescending<Member> { it.localDailyScores[until - 1] }.thenByDescending { it.lastStarTimestamp }
+        ).filterIndexed { index, member -> index < top || member.rankings.count { it != null } > min }
     }
 
     private fun Leaderboard.computeLocalDailyScores(until: Int) {
