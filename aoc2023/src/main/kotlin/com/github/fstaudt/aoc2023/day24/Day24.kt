@@ -49,8 +49,8 @@ class Day24(fileName: String = "day_24.txt") : Day {
 
     private fun sumRockPositions(): Long {
         val hailStones = input.toHailStones()
-        Context().use {
-            with(it) {
+        Context().use { context ->
+            with(context) {
                 val solver = mkSolver()
                 val rock = Z3HailStone(
                     Z3Position(mkIntConst("px"), mkIntConst("py"), mkIntConst("pz")),
@@ -73,15 +73,15 @@ class Day24(fileName: String = "day_24.txt") : Day {
                         ),
                     )
                 }
-                solver.check().let { if (it == UNSATISFIABLE) return 0 }
-                val solved = with(solver.model) {
+                solver.check().let { status -> if (status == UNSATISFIABLE) return 0 }
+                val solution = with(solver.model) {
                     HailStone(
                         0,
                         Position(evalAsLong(rock.pos.x), evalAsLong(rock.pos.y), evalAsLong(rock.pos.z)),
                         Velocity(evalAsLong(rock.vel.x), evalAsLong(rock.vel.y), evalAsLong(rock.vel.z))
                     )
                 }
-                return solved.pos.x + solved.pos.y + solved.pos.z
+                return solution.pos.x + solution.pos.y + solution.pos.z
             }
         }
     }

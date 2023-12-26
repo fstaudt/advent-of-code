@@ -45,7 +45,7 @@ class Day23(fileName: String = "day_23.txt") : Day {
                 var previous = position
                 var current = adjacent
                 while (current.adjacentPositions.size == 2) {
-                    var next = current.adjacentPositions.first { it != previous }
+                    val next = current.adjacentPositions.first { it != previous }
                     previous = current
                     current = next
                     weight++
@@ -67,7 +67,7 @@ class Day23(fileName: String = "day_23.txt") : Day {
                 var current = adjacent
                 var valid = true
                 while (current.adjacentPositions.size == 2) {
-                    var next = current.adjacentPositions.first { it != previous }
+                    val next = current.adjacentPositions.first { it != previous }
                     previous = current
                     current = next
                     if (current.type.slope != null) {

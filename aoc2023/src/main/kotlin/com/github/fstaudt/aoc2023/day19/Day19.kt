@@ -33,9 +33,9 @@ class Day19(fileName: String = "day_19.txt") : Day {
         return parts.sumOf { part ->
             var result = "in"
             while (result != "A" && result != "R") {
-                result = workflows[result]!!.let {
-                    it.rules.firstOrNull { it.condition.matchesFor(part) }?.workflowOrResult
-                        ?: it.defaultWorkflowOrResult
+                result = workflows[result]!!.let { workflow ->
+                    workflow.rules.firstOrNull { it.condition.matchesFor(part) }?.workflowOrResult
+                        ?: workflow.defaultWorkflowOrResult
                 }
             }
             if (result == "A") part.ratings.values.sum() else 0

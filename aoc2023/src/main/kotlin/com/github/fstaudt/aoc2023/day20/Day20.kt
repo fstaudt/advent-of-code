@@ -25,59 +25,7 @@ class Day20(fileName: String = "day_20.txt") : Day {
         var highCount = 0L
         var lowCount = 0L
         for (push in (1..1000)) {
-            val pulses = MutableList(1) { Pulse("", "roadcaster", LOW) }
-            while (pulses.isNotEmpty()) {
-                val pulse = pulses.removeFirst()
-                if (pulse.type == HIGH) highCount++ else lowCount++
-                val module = modules[pulse.destination] ?: Module(pulse.destination, FINAL, emptyList())
-                when (module.type) {
-                    BROADCASTER ->
-                        module.destinations.forEach {
-                            pulses += Pulse(module.id, it, pulse.type)
-                        }
-
-                    FLIP_FLOP -> {
-                        if (pulse.type == LOW) {
-                            when (module.state) {
-                                ON -> {
-                                    module.state = OFF
-                                    module.destinations.forEach {
-                                        pulses += Pulse(module.id, it, LOW)
-                                    }
-                                }
-
-                                OFF -> {
-                                    module.state = ON
-                                    module.destinations.forEach {
-                                        pulses += Pulse(module.id, it, HIGH)
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    CONJUNCTION -> {
-                        module.inputs[pulse.origin] = pulse.type
-                        module.state = if (module.inputs.all { it.value == HIGH }) ON else OFF
-                        when (module.state) {
-                            ON -> {
-                                module.destinations.forEach {
-                                    pulses += Pulse(module.id, it, LOW)
-                                }
-                            }
-
-                            OFF -> {
-                                module.destinations.forEach {
-                                    pulses += Pulse(module.id, it, HIGH)
-                                }
-                            }
-                        }
-                    }
-
-                    FINAL ->
-                        if (pulse.type == LOW) module.state = ON
-                }
-            }
+            sendLowPulseTo(modules, onPulse = { if (it.type == HIGH) highCount += 1 else lowCount += 1 })
         }
         return highCount * lowCount
     }
@@ -86,67 +34,57 @@ class Day20(fileName: String = "day_20.txt") : Day {
         val modules = input.toModules()
         var pushCount = 0L
         val lastConjunction = modules.values.first { it.type == CONJUNCTION && it.destinations.contains("rx") }
-        val flipFlopGroups =
+        val groups =
             modules.values.filter { it.type == CONJUNCTION && it.destinations.contains(lastConjunction.id) }
-        while (!flipFlopGroups.all { it.pushCountBeforeFirstHighPulse > 0 }) {
-            val pulses = MutableList(1) { Pulse("", "roadcaster", LOW) }
+        while (!groups.all { it.pushCountBeforeFirstHighPulse != null }) {
             pushCount++
-            while (pulses.isNotEmpty()) {
-                val pulse = pulses.removeFirst()
-                val module = modules[pulse.destination] ?: Module(pulse.destination, FINAL, emptyList())
-                when (module.type) {
-                    FINAL ->
-                        if (pulse.type == LOW) module.state = ON
+            sendLowPulseTo(modules) { it.pushCountBeforeFirstHighPulse = it.pushCountBeforeFirstHighPulse ?: pushCount }
+        }
+        return groups.map { it.pushCountBeforeFirstHighPulse!! }.toLeastCommonMultiple()
+    }
 
-                    BROADCASTER ->
-                        module.destinations.forEach {
-                            pulses += Pulse(module.id, it, pulse.type)
-                        }
-
-                    FLIP_FLOP -> {
-                        if (pulse.type == LOW) {
-                            when (module.state) {
-                                ON -> {
-                                    module.state = OFF
-                                    module.destinations.forEach {
-                                        pulses += Pulse(module.id, it, LOW)
-                                    }
-                                }
-
-                                OFF -> {
-                                    module.state = ON
-                                    module.destinations.forEach {
-                                        pulses += Pulse(module.id, it, HIGH)
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    CONJUNCTION -> {
-                        module.inputs[pulse.origin] = pulse.type
-                        module.state = if (module.inputs.values.all { it == HIGH }) ON else OFF
+    private fun sendLowPulseTo(
+        modules: Map<String, Module>,
+        onPulse: (Pulse) -> Unit = {},
+        onHighPulseSentByConjunction: (Module) -> Unit = {}
+    ) {
+        val pulses = MutableList(1) { Pulse("", "roadcaster", LOW) }
+        while (pulses.isNotEmpty()) {
+            val pulse = pulses.removeFirst()
+            onPulse(pulse)
+            val module = modules[pulse.destination] ?: Module(pulse.destination, FINAL, emptyList())
+            when (module.type) {
+                FINAL -> if (pulse.type == LOW) module.state = ON
+                BROADCASTER -> module.destinations.forEach { pulses += Pulse(module.id, it, pulse.type) }
+                FLIP_FLOP -> {
+                    if (pulse.type == LOW) {
                         when (module.state) {
                             ON -> {
-                                module.destinations.forEach {
-                                    pulses += Pulse(module.id, it, LOW)
-                                }
+                                module.state = OFF
+                                module.destinations.forEach { pulses += Pulse(module.id, it, LOW) }
                             }
 
                             OFF -> {
-                                module.pushCountBeforeFirstHighPulse = pushCount
-                                module.highPulses += pushCount
-                                module.destinations.forEach {
-                                    pulses += Pulse(module.id, it, HIGH)
-                                }
+                                module.state = ON
+                                module.destinations.forEach { pulses += Pulse(module.id, it, HIGH) }
                             }
                         }
                     }
                 }
+
+                CONJUNCTION -> {
+                    module.inputs[pulse.origin] = pulse.type
+                    module.state = if (module.inputs.all { it.value == HIGH }) ON else OFF
+                    when (module.state) {
+                        ON -> module.destinations.forEach { pulses += Pulse(module.id, it, LOW) }
+                        OFF -> {
+                            onHighPulseSentByConjunction(module)
+                            module.destinations.forEach { pulses += Pulse(module.id, it, HIGH) }
+                        }
+                    }
+                }
             }
-            // println("$pushCount: ${modules.values.joinToString(" ") { "${it.id}: {${it.state}, ${it.inputs}}" }}")
         }
-        return flipFlopGroups.map { it.pushCountBeforeFirstHighPulse }.toLeastCommonMultiple()
     }
 
     private fun List<String>.toModules(): Map<String, Module> {
@@ -172,8 +110,7 @@ class Day20(fileName: String = "day_20.txt") : Day {
         val destinations: List<String>,
         val inputs: MutableMap<String, PulseType> = mutableMapOf(),
         var state: State = OFF,
-        var pushCountBeforeFirstHighPulse: Long = 0,
-        var highPulses: MutableList<Long> = mutableListOf(),
+        var pushCountBeforeFirstHighPulse: Long? = null,
     )
 
     enum class ModuleType(val char: Char) {

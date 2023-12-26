@@ -18,10 +18,10 @@ class Day3(fileName: String = "day_3.txt") : Day {
 
 
     private fun List<String>.sumGearRatios(): Long {
-        val partNumbers = partNumbers().filter { it.symbols.any { it.char == '*' } }
+        val partNumbers = partNumbers().filter { partNumber -> partNumber.symbols.any { it.char == '*' } }
         return partNumbers.mapNotNull { partNumber ->
-            partNumbers.find {
-                it != partNumber && it.symbols.filter { it.char == '*' }.any { partNumber.symbols.contains(it) }
+            partNumbers.find { other ->
+                other != partNumber && other.symbols.filter { it.char == '*' }.any { partNumber.symbols.contains(it) }
             }?.let {
                 partNumber.value * it.value
             }
@@ -34,13 +34,13 @@ class Day3(fileName: String = "day_3.txt") : Day {
             val previousLine = lines[0]
             val nextLine = lines[2]
             var index = 0
-            lines[1].split(Regex("\\D+")).filter { it.contains(Regex("\\d+")) }.map {
-                val partIndex = line.indexOf(it, index)
+            lines[1].split(Regex("\\D+")).filter { it.contains(Regex("\\d+")) }.map { value ->
+                val partIndex = line.indexOf(value, index)
                 val startIndex = max(partIndex - 1, 0)
-                val endIndex = min(partIndex + it.length, line.length - 1)
+                val endIndex = min(partIndex + value.length, line.length - 1)
                 index = endIndex
                 PartNumber(
-                    it.toLong(),
+                    value.toLong(),
                     lineIndex,
                     partIndex,
                     previousLine.substring(startIndex, endIndex + 1).toSymbols(lineIndex, startIndex)

@@ -48,14 +48,10 @@ class Day15(fileName: String = "day_15.txt") : Day {
     }
 
     private fun String.toHash(): Int {
-        return fold(0) { hash, c -> ((hash + c.toInt()) * 17).rem(256) }
+        return fold(0) { hash, c -> ((hash + c.code) * 17).rem(256) }
     }
 
     data class Instruction(val label: String, val operation: Operation, val focal: Int? = null)
-    enum class Operation(char: Char) {
-        EQUALS('='),
-        DASH('-'),
-    }
-
+    enum class Operation { EQUALS, DASH }
     data class Lens(val label: String, val focal: Int)
 }
