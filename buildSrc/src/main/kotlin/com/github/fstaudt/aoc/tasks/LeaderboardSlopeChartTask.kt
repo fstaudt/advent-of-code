@@ -128,7 +128,7 @@ abstract class LeaderboardSlopeChartTask : DefaultTask() {
             legendBackgroundColor = WHITE
             legendBorderColor = WHITE
             xAxisTickMarksColor = WHITE
-            setxAxisTickLabelsFormattingFunction { if (it > 25) "*" else "${it.toInt()}" }
+            setxAxisTickLabelsFormattingFunction { if (it > 25) "final" else "${it.toInt()}" }
             yAxisTickMarksColor = WHITE
         }
         val days = (firstDay..lastDay).toList() + (if (final) listOf(26) else emptyList())
