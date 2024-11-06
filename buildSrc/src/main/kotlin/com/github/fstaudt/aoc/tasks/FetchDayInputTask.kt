@@ -40,7 +40,7 @@ abstract class FetchDayInputTask : DefaultTask() {
 
     @TaskAction
     fun fetchDayInput() {
-        if (day > "25") throw AdventIsOverException(day)
+        if (day.toInt() > 25) throw AdventIsOverException(day)
         File(layout.projectDirectory.asFile, "src/main/resources").also { mainResources ->
             mainResources.mkdirs()
             File(mainResources, "day_$day.txt").writeText(input())

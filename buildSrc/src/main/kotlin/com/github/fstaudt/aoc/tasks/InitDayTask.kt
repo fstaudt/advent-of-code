@@ -38,7 +38,7 @@ abstract class InitDayTask : DefaultTask() {
 
     @TaskAction
     fun initDay() {
-        if (day > "25") throw AdventIsOverException(day)
+        if (day.toInt() > 25) throw AdventIsOverException(day)
         val packageDir = "com/github/fstaudt/aoc$year/day$day"
         File(layout.projectDirectory.asFile, "src/main/kotlin/$packageDir").also { mainSources ->
             if (mainSources.exists() && !force) throw Exception("Sources for day $day already exist.")
