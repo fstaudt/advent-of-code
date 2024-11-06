@@ -2,9 +2,9 @@ package com.github.fstaudt.aoc2023.day23
 
 import com.github.fstaudt.aoc.shared.Day
 import com.github.fstaudt.aoc.shared.Input.readInputLines
-import com.github.fstaudt.aoc.shared.graph.Graph
-import com.github.fstaudt.aoc.shared.graph.Node
-import com.github.fstaudt.aoc.shared.graph.Vertex
+import com.github.fstaudt.aoc2023.day23.graph.Graph
+import com.github.fstaudt.aoc2023.day23.graph.Node
+import com.github.fstaudt.aoc2023.day23.graph.Vertex
 import com.github.fstaudt.aoc2023.day23.Day23.TileType.FOREST
 import com.github.fstaudt.aoc2023.day23.Day23.TileType.PATH
 

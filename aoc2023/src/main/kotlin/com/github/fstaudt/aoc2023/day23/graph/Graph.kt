@@ -1,4 +1,4 @@
-package com.github.fstaudt.aoc.shared.graph
+package com.github.fstaudt.aoc2023.day23.graph
 
 import kotlin.math.max
 
