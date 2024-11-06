@@ -14,11 +14,17 @@ import com.github.fstaudt.aoc.TestFunctions.part1
 import com.github.fstaudt.aoc.TestFunctions.part2
 import com.github.fstaudt.aoc.TestFunctions.withCompletionParts
 import org.assertj.core.api.Assertions.assertThat
+import org.gradle.api.services.BuildServiceParameters.None
 import org.junit.jupiter.api.Test
 
-class LeaderboardSlopeChartTaskTest {
+class LeaderboardServiceTest {
 
-    private val leaderboardService = LeaderboardService()
+    class TestLeaderboardService: LeaderboardService() {
+        override fun getParameters(): None {
+            throw UnsupportedOperationException("Not supported yet.")
+        }
+    }
+    private val leaderboardService = TestLeaderboardService()
     private val owner = member(OWNER_ID, 12).withCompletionParts(
         1 to mapOf(part1(DAY1 + 1), part2(DAY1 + 2)),
         2 to mapOf(part1(DAY2 + 1), part2(DAY2 + 2)),

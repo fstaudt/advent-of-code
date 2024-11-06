@@ -1,5 +1,7 @@
 package com.github.fstaudt.aoc
 
+import com.github.fstaudt.aoc.service.JsonMapper
+import com.github.fstaudt.aoc.service.LeaderboardService
 import com.github.fstaudt.aoc.tasks.FetchDayInputTask
 import com.github.fstaudt.aoc.tasks.InitDayTask
 import com.github.fstaudt.aoc.tasks.LeaderboardSlopeChartTask
@@ -17,6 +19,9 @@ class AdventOfCodePlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
         with(project) {
+            val leaderboardService =
+                gradle.sharedServices.registerIfAbsent("leaderboard", LeaderboardService::class.java)
+            val jsonMapper = gradle.sharedServices.registerIfAbsent("jsonMapper", JsonMapper::class.java)
             val extension = extensions.create("adventOfCode", AdventOfCodeExtension::class.java).apply {
                 year.convention(Calendar.getInstance().get(YEAR))
             }
@@ -30,6 +35,8 @@ class AdventOfCodePlugin : Plugin<Project> {
                     leaderboard.min.convention(2)
                     leaderboard.force.convention(false)
                     leaderboard.sessionCookieFile.convention(DEFAULT_SESSION_COOKIE_FILE)
+                    leaderboard.leaderboardService.set(leaderboardService)
+                    leaderboard.jsonMapper.set(jsonMapper)
                 }
             } else {
                 tasks.register(InitDayTask.NAME, InitDayTask::class.java) { initDay ->
