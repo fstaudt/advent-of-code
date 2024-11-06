@@ -1,9 +1,8 @@
 package com.github.fstaudt.aoc.tasks
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.github.fstaudt.aoc.AdventOfCodePlugin.Companion.GROUP
 import com.github.fstaudt.aoc.model.Leaderboard
+import com.github.fstaudt.aoc.service.JsonMapper
 import com.github.fstaudt.aoc.service.LeaderboardService
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.HttpClientBuilder
@@ -84,13 +83,11 @@ abstract class LeaderboardSlopeChartTask : DefaultTask() {
     @get:Inject
     protected abstract val layout: ProjectLayout
 
-    @Internal
-    protected val jsonMapper = ObjectMapper().also {
-        it.registerModule(KotlinModule.Builder().build())
-    }
+    @get:Internal
+    abstract val jsonMapper: Property<JsonMapper>
 
-    @Internal
-    protected val leaderboardService = LeaderboardService()
+    @get:Internal
+    abstract val leaderboardService: Property<LeaderboardService>
 
     @TaskAction
     fun generateSlopeChart() {
@@ -127,8 +124,8 @@ abstract class LeaderboardSlopeChartTask : DefaultTask() {
         val until = until.get()
         val min = min.get()
         val final = final.get()
-        val leaderboard = jsonMapper.readValue(leaderboardFile, Leaderboard::class.java)
-        val members = leaderboardService.topMembers(leaderboard, top, until, min, final)
+        val leaderboard = jsonMapper.get().readValue(leaderboardFile, Leaderboard::class.java)
+        val members = leaderboardService.get().topMembers(leaderboard, top, until, min, final)
         val firstDay = runCatching { from.toInt() }.getOrElse { 1 }
         val lastDay = runCatching { until.toInt() }.getOrElse { 25 }.coerceAtMost(leaderboard.numberOfDays())
         val numberOfDays = lastDay - firstDay + 1

@@ -5,9 +5,11 @@ import com.github.fstaudt.aoc.model.CompletionPartsFunctions.part1
 import com.github.fstaudt.aoc.model.CompletionPartsFunctions.part2
 import com.github.fstaudt.aoc.model.Leaderboard
 import com.github.fstaudt.aoc.model.Member
+import org.gradle.api.services.BuildService
+import org.gradle.api.services.BuildServiceParameters.None
 import kotlin.Int.Companion.MAX_VALUE
 
-class LeaderboardService {
+abstract class LeaderboardService : BuildService<None> {
 
     fun topMembers(
         leaderboard: Leaderboard,

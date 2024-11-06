@@ -54,7 +54,7 @@ abstract class FetchDayInputTask : DefaultTask() {
     private fun input(): String {
         val day = day.get()
         val year = format("%4d", year.get())
-        val cookie = File(project.rootDir, sessionCookieFile.get()).readLines().first { it.isNotBlank() }
+        val cookie = File(layout.projectDirectory.asFile.parentFile, sessionCookieFile.get()).readLines().first { it.isNotBlank() }
         return HttpClientBuilder.create().setDefaultHeaders(listOf(BasicHeader("Cookie", cookie))).build()
             .execute(HttpGet("https://adventofcode.com/$year/day/$day/input"))
             .entity.content.readAllBytes().let { String(it) }
