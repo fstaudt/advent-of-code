@@ -41,7 +41,7 @@ abstract class InitDayTask : DefaultTask() {
 
     @TaskAction
     fun initDay() {
-        val day = format("%d", day.get())
+        val day = format("%02d", day.get())
         val year = format("%4d", year.get())
         if (day.toInt() > 25) throw AdventIsOverException(day)
         val packageDir = "com/github/fstaudt/aoc$year/day$day"

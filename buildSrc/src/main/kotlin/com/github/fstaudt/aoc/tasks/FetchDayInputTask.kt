@@ -43,7 +43,7 @@ abstract class FetchDayInputTask : DefaultTask() {
 
     @TaskAction
     fun fetchDayInput() {
-        val day = format("%d", day.get())
+        val day = format("%02d", day.get())
         if (day.toInt() > 25) throw AdventIsOverException(day)
         File(layout.projectDirectory.asFile, "src/main/resources").also { mainResources ->
             mainResources.mkdirs()
