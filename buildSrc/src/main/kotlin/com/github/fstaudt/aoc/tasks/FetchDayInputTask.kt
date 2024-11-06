@@ -7,13 +7,13 @@ import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.message.BasicHeader
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ProjectLayout
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.options.Option
 import java.io.File
-import java.util.*
-import java.util.Calendar.DAY_OF_MONTH
-import java.util.Calendar.YEAR
+import java.lang.String.format
 import javax.inject.Inject
 
 abstract class FetchDayInputTask : DefaultTask() {
@@ -24,22 +24,26 @@ abstract class FetchDayInputTask : DefaultTask() {
     override fun getGroup() = GROUP
     override fun getDescription() = "Fetch input for day of advent calendar"
 
-    @Input
-    @Option(description = "day in advent calendar (defaults to current day of month)")
-    var day: String = "${Calendar.getInstance().get(DAY_OF_MONTH)}"
+    @get:Input
+    @get:Option(option = "year", description = "year of advent calendar (defaults to current year)")
+    @get:Optional
+    abstract val year: Property<Int>
 
-    @Input
-    @Option(description = "year of advent calendar (defaults to current year)")
-    var year: String = "${Calendar.getInstance().get(YEAR)}"
+    @get:Input
+    @get:Option(option = "day", description = "day in advent calendar (defaults to current day of month)")
+    @get:Optional
+    abstract val day: Property<Int>
 
-    @Input
-    var sessionCookieFile: String = "cookie.txt"
+    @get:Input
+    @get:Optional
+    abstract val sessionCookieFile: Property<String>
 
     @get:Inject
     protected abstract val layout: ProjectLayout
 
     @TaskAction
     fun fetchDayInput() {
+        val day = format("%d", day.get())
         if (day.toInt() > 25) throw AdventIsOverException(day)
         File(layout.projectDirectory.asFile, "src/main/resources").also { mainResources ->
             mainResources.mkdirs()
@@ -48,7 +52,9 @@ abstract class FetchDayInputTask : DefaultTask() {
     }
 
     private fun input(): String {
-        val cookie = File(project.rootDir, sessionCookieFile).readLines().first { it.isNotBlank() }
+        val day = day.get()
+        val year = format("%4d", year.get())
+        val cookie = File(project.rootDir, sessionCookieFile.get()).readLines().first { it.isNotBlank() }
         return HttpClientBuilder.create().setDefaultHeaders(listOf(BasicHeader("Cookie", cookie))).build()
             .execute(HttpGet("https://adventofcode.com/$year/day/$day/input"))
             .entity.content.readAllBytes().let { String(it) }

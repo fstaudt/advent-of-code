@@ -10,8 +10,10 @@ import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.message.BasicHeader
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ProjectLayout
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.options.Option
 import org.knowm.xchart.BitmapEncoder.BitmapFormat.PNG
@@ -22,6 +24,7 @@ import java.awt.Color.WHITE
 import java.awt.Font
 import java.awt.Font.BOLD
 import java.io.File
+import java.lang.String.format
 import javax.inject.Inject
 
 abstract class LeaderboardSlopeChartTask : DefaultTask() {
@@ -32,40 +35,51 @@ abstract class LeaderboardSlopeChartTask : DefaultTask() {
     override fun getGroup() = GROUP
     override fun getDescription() = "Generate slope chart for top members of private leaderboard"
 
-    @Input
-    @Option(description = "year of advent calendar")
-    lateinit var year: String
+    @get:Input
+    @get:Option(option = "year", description = "year of advent calendar")
+    @get:Optional
+    abstract val year: Property<Int>
 
-    @Input
-    @Option(description = "ID of private leaderboard")
-    lateinit var id: String
+    @get:Input
+    @get:Option(option = "id", description = "ID of private leaderboard")
+    abstract val id: Property<String>
 
-    @Input
-    @Option(description = "number of top members displayed in slope chart")
-    var top: String = "20"
+    @get:Input
+    @get:Option(option = "top", description = "number of top members displayed in slope chart")
+    @get:Optional
+    abstract val top: Property<Int>
 
-    @Input
-    @Option(description = "first day displayed in slope chart")
-    var from: String = "1"
+    @get:Input
+    @get:Option(option = "from", description = "first day displayed in slope chart")
+    @get:Optional
+    abstract val from: Property<Int>
 
-    @Input
-    @Option(description = "last day displayed in slope chart")
-    var until: String = "25"
+    @get:Input
+    @get:Option(option = "until", description = "last day displayed in slope chart")
+    @get:Optional
+    abstract val until: Property<Int>
 
-    @Input
-    @Option(description = "include final ranking in slope chart")
-    var final: Boolean = true
+    @get:Input
+    @get:Option(option = "final", description = "include final ranking in slope chart")
+    @get:Optional
+    abstract val final: Property<Boolean>
 
-    @Input
-    @Option(description = "minimum required number of appearances in top for members not in top on last day")
-    var min: String = "2"
+    @get:Input
+    @get:Option(
+        option = "min",
+        description = "minimum required number of appearances in top for members not in top on last day"
+    )
+    @get:Optional
+    abstract val min: Property<Int>
 
-    @Input
-    @Option(description = "force download of leaderboard JSON - use wisely!")
-    var force: Boolean = false
+    @get:Input
+    @get:Option(option = "force", description = "force download of leaderboard JSON - use wisely!")
+    @get:Optional
+    abstract val force: Property<Boolean>
 
-    @Input
-    var sessionCookieFile: String = "cookie.txt"
+    @get:Input
+    @get:Optional
+    abstract val sessionCookieFile: Property<String>
 
     @get:Inject
     protected abstract val layout: ProjectLayout
@@ -80,33 +94,41 @@ abstract class LeaderboardSlopeChartTask : DefaultTask() {
 
     @TaskAction
     fun generateSlopeChart() {
+        val year = format("%04d", year.get())
+        val id = id.get()
         File(layout.buildDirectory.asFile.get(), "aoc/leaderboards/$year").also { leaderboardsDir ->
             leaderboardsDir.mkdirs()
             File(leaderboardsDir, "$id.json").also { leaderboardFile ->
-                if (force || !leaderboardFile.exists()) {
-                    leaderboardFile.writeText(input())
+                if (force.get() || !leaderboardFile.exists()) {
+                    leaderboardFile.writeText(input(year, id))
                 }
                 generateSlopeChartFor(leaderboardFile)
             }
         }
     }
 
-    private fun input(): String {
+    private fun input(year: String, id: String): String {
         logger.warn(
             """
                 Please don't make frequent automated requests to Advent of code API.
                 Avoid sending requests more often than once every 15 minutes (900 seconds).
                 """.trimIndent()
         )
-        val cookie = File(layout.projectDirectory.asFile, sessionCookieFile).readLines().first { it.isNotBlank() }
+        val cookie = File(layout.projectDirectory.asFile, sessionCookieFile.get()).readLines().first { it.isNotBlank() }
         return HttpClientBuilder.create().setDefaultHeaders(listOf(BasicHeader("Cookie", cookie))).build()
             .execute(HttpGet("https://adventofcode.com/$year/leaderboard/private/view/$id.json"))
             .entity.content.readAllBytes().let { String(it) }
     }
 
     private fun generateSlopeChartFor(leaderboardFile: File) {
+        val id = id.get()
+        val top = top.get()
+        val from = from.get()
+        val until = until.get()
+        val min = min.get()
+        val final = final.get()
         val leaderboard = jsonMapper.readValue(leaderboardFile, Leaderboard::class.java)
-        val members = leaderboardService.topMembers(leaderboard, top.toInt(), until.toInt(), min.toInt(), final)
+        val members = leaderboardService.topMembers(leaderboard, top, until, min, final)
         val firstDay = runCatching { from.toInt() }.getOrElse { 1 }
         val lastDay = runCatching { until.toInt() }.getOrElse { 25 }.coerceAtMost(leaderboard.numberOfDays())
         val numberOfDays = lastDay - firstDay + 1

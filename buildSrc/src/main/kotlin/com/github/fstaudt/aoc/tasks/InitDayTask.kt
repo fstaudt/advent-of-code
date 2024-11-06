@@ -4,13 +4,13 @@ import com.github.fstaudt.aoc.AdventOfCodePlugin.Companion.GROUP
 import com.github.fstaudt.aoc.exception.AdventIsOverException
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ProjectLayout
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.options.Option
 import java.io.File
-import java.util.*
-import java.util.Calendar.DAY_OF_MONTH
-import java.util.Calendar.YEAR
+import java.lang.String.format
 import javax.inject.Inject
 
 abstract class InitDayTask : DefaultTask() {
@@ -21,27 +21,32 @@ abstract class InitDayTask : DefaultTask() {
     override fun getGroup() = GROUP
     override fun getDescription() = "Init sources for day of advent calendar"
 
-    @Input
-    @Option(description = "day in advent calendar (defaults to current day of month)")
-    var day: String = "${Calendar.getInstance().get(DAY_OF_MONTH)}"
+    @get:Input
+    @get:Option(option = "year", description = "year of advent calendar (defaults to current year)")
+    @get:Optional
+    abstract val year: Property<Int>
 
-    @Input
-    @Option(description = "year of advent calendar (defaults to current year)")
-    var year: String = "${Calendar.getInstance().get(YEAR)}"
+    @get:Input
+    @get:Option(option = "day", description = "day in advent calendar (defaults to current day of month)")
+    @get:Optional
+    abstract val day: Property<Int>
 
-    @Input
-    @Option(description = "overwrite existing sources")
-    var force: Boolean = false
+    @get:Input
+    @get:Option(option = "force", description = "overwrite existing sources")
+    @get:Optional
+    abstract val force: Property<Boolean>
 
     @get:Inject
     protected abstract val layout: ProjectLayout
 
     @TaskAction
     fun initDay() {
+        val day = format("%d", day.get())
+        val year = format("%4d", year.get())
         if (day.toInt() > 25) throw AdventIsOverException(day)
         val packageDir = "com/github/fstaudt/aoc$year/day$day"
         File(layout.projectDirectory.asFile, "src/main/kotlin/$packageDir").also { mainSources ->
-            if (mainSources.exists() && !force) throw Exception("Sources for day $day already exist.")
+            if (mainSources.exists() && !force.get()) throw Exception("Sources for day $day already exist.")
             mainSources.mkdirs()
             File(mainSources, "Day$day.kt").writeText(
                 """

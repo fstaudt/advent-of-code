@@ -21,10 +21,6 @@ tasks.test {
     useJUnitPlatform()
 }
 
-tasks.initDay {
-    year = "2024"
-}
-
-tasks.fetchDayInput {
-    year = "2024"
+adventOfCode {
+    year = 2024
 }
