@@ -11,6 +11,9 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.options.Option
 import java.io.File
 import java.lang.String.format
+import java.util.*
+import java.util.Calendar.DAY_OF_MONTH
+import java.util.Calendar.YEAR
 import javax.inject.Inject
 
 abstract class InitDayTask : DefaultTask() {
@@ -41,8 +44,8 @@ abstract class InitDayTask : DefaultTask() {
 
     @TaskAction
     fun initDay() {
-        val day = format("%02d", day.get())
-        val year = format("%4d", year.get())
+        val day = format("%02d", day.getOrElse(Calendar.getInstance().get(DAY_OF_MONTH)))
+        val year = format("%4d", year.getOrElse(Calendar.getInstance().get(YEAR)))
         if (day.toInt() > 25) throw AdventIsOverException(day)
         val packageDir = "com/github/fstaudt/aoc$year/day$day"
         File(layout.projectDirectory.asFile, "src/main/kotlin/$packageDir").also { mainSources ->

@@ -14,6 +14,9 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.options.Option
 import java.io.File
 import java.lang.String.format
+import java.util.*
+import java.util.Calendar.DAY_OF_MONTH
+import java.util.Calendar.YEAR
 import javax.inject.Inject
 
 abstract class FetchDayInputTask : DefaultTask() {
@@ -43,7 +46,7 @@ abstract class FetchDayInputTask : DefaultTask() {
 
     @TaskAction
     fun fetchDayInput() {
-        val day = format("%02d", day.get())
+        val day = format("%02d", day.getOrElse(Calendar.getInstance().get(DAY_OF_MONTH)))
         if (day.toInt() > 25) throw AdventIsOverException(day)
         File(layout.projectDirectory.asFile, "src/main/resources").also { mainResources ->
             mainResources.mkdirs()
@@ -52,9 +55,10 @@ abstract class FetchDayInputTask : DefaultTask() {
     }
 
     private fun input(): String {
-        val day = day.get()
-        val year = format("%4d", year.get())
-        val cookie = File(layout.projectDirectory.asFile.parentFile, sessionCookieFile.get()).readLines().first { it.isNotBlank() }
+        val day = day.getOrElse(Calendar.getInstance().get(DAY_OF_MONTH))
+        val year = year.getOrElse(Calendar.getInstance().get(YEAR))
+        val cookie = File(layout.projectDirectory.asFile.parentFile, sessionCookieFile.get()).readLines()
+            .first { it.isNotBlank() }
         return HttpClientBuilder.create().setDefaultHeaders(listOf(BasicHeader("Cookie", cookie))).build()
             .execute(HttpGet("https://adventofcode.com/$year/day/$day/input"))
             .entity.content.readAllBytes().let { String(it) }
