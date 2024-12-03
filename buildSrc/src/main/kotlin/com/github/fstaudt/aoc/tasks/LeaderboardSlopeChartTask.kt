@@ -99,7 +99,7 @@ abstract class LeaderboardSlopeChartTask : DefaultTask() {
                 if (force.get() || !leaderboardFile.exists()) {
                     leaderboardFile.writeText(input(year, id))
                 }
-                generateSlopeChartFor(leaderboardFile)
+                generateSlopeChartFor(leaderboardFile, year)
             }
         }
     }
@@ -117,7 +117,7 @@ abstract class LeaderboardSlopeChartTask : DefaultTask() {
             .entity.content.readAllBytes().let { String(it) }
     }
 
-    private fun generateSlopeChartFor(leaderboardFile: File) {
+    private fun generateSlopeChartFor(leaderboardFile: File, year: String) {
         val id = id.get()
         val top = top.get()
         val from = from.get()
@@ -132,7 +132,7 @@ abstract class LeaderboardSlopeChartTask : DefaultTask() {
         val chart = XYChartBuilder()
             .width((numberOfDays + (if (final) 1 else 0)) * 120 + 150).height(members.size * 30)
             .xAxisTitle("Day")
-            .title("Advent of Code 2023 - private leaderboard of ${leaderboard.owner()} ($id) - top $top")
+            .title("Advent of Code $year - private leaderboard of ${leaderboard.owner()} ($id) - top $top")
             .build()
         chart.styler.apply {
             chartTitleFont = Font("SansSerif", BOLD, 24)
