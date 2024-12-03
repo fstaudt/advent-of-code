@@ -138,7 +138,7 @@ abstract class LeaderboardSlopeChartTask : DefaultTask() {
             .build()
         chart.styler.apply {
             chartTitleFont = Font("SansSerif", BOLD, 24)
-            yAxisMin = top.toDouble()
+            yAxisMin = members.size.toDouble()
             yAxisMax = 1.0
             yAxisLeftWidthHint = 20
             legendPosition = OutsideE
@@ -157,8 +157,8 @@ abstract class LeaderboardSlopeChartTask : DefaultTask() {
             val rankings = member.rankings.drop(firstDay - 1).take(numberOfDays).toMutableList().also {
                 if (final) it += member.rankings.last()
             }
-            val name =
-                "${index + 1} - ${member.name()} (${if (final) member.localScore else member.localDailyScores[lastDay - 1]})"
+            val score = if (final) member.localScore else member.localDailyScores[lastDay - 1]
+            val name = "${index + 1} - ${member.name()} ($score)"
             chart.addSeries(name, days, rankings)
         }
         saveBitmap(chart, leaderboardFile.canonicalPath, PNG)

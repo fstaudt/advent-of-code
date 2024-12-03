@@ -98,10 +98,10 @@ class LeaderboardServiceTest {
     }
 
     @Test
-    fun `topMembers should return local daily scores to 0 for ghost players`() {
+    fun `topMembers should filter ghost members`() {
         val ghost = member(GHOST_ID, 0)
         val topMembers = leaderboardService.topMembers(leaderboard(owner, player, ghost), 3)
-        assertThat(topMembers[2].localDailyScores).isEqualTo(listOf(0, 0, 0))
+        assertThat(topMembers).hasSize(2)
     }
 
     @Test

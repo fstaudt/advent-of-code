@@ -44,7 +44,9 @@ abstract class LeaderboardService : BuildService<None> {
                 compareByDescending<Member> { it.localScore }.thenByDescending { it.lastStarTimestamp }
             else
                 compareByDescending<Member> { it.localDailyScores[until - 1] }.thenByDescending { it.lastStarTimestamp }
-        ).filterIndexed { index, member -> index < top || member.rankings.count { it != null } > min }
+        ).filterIndexed { index, member ->
+            (index < top || member.rankings.count { it != null } > min) && member.localScore > 0
+        }
     }
 
     private fun Leaderboard.computeLocalDailyScores(until: Int) {
