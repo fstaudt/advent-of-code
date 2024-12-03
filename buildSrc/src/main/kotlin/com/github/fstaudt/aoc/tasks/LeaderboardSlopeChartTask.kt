@@ -25,6 +25,7 @@ import java.awt.Font.BOLD
 import java.io.File
 import java.lang.String.format
 import javax.inject.Inject
+import kotlin.math.max
 
 abstract class LeaderboardSlopeChartTask : DefaultTask() {
     companion object {
@@ -130,7 +131,8 @@ abstract class LeaderboardSlopeChartTask : DefaultTask() {
         val lastDay = runCatching { until.toInt() }.getOrElse { 25 }.coerceAtMost(leaderboard.numberOfDays())
         val numberOfDays = lastDay - firstDay + 1
         val chart = XYChartBuilder()
-            .width((numberOfDays + (if (final) 1 else 0)) * 120 + 150).height(members.size * 30)
+            .width(max(1250,(numberOfDays + (if (final) 1 else 0)) * 120 + 150))
+            .height(members.size * 30)
             .xAxisTitle("Day")
             .title("Advent of Code $year - private leaderboard of ${leaderboard.owner()} ($id) - top $top")
             .build()
