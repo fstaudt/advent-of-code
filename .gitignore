@@ -8,3 +8,4 @@ target/
 build/
 */src/main/resources
 cookie.txt
+.kotlin
