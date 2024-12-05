@@ -26,6 +26,7 @@ import java.io.File
 import java.lang.String.format
 import javax.inject.Inject
 import kotlin.math.max
+import kotlin.math.min
 
 abstract class LeaderboardSlopeChartTask : DefaultTask() {
     companion object {
@@ -138,7 +139,7 @@ abstract class LeaderboardSlopeChartTask : DefaultTask() {
             .build()
         chart.styler.apply {
             chartTitleFont = Font("SansSerif", BOLD, 24)
-            yAxisMin = members.size.toDouble()
+            yAxisMin = min(top, members.size).toDouble()
             yAxisMax = 1.0
             yAxisLeftWidthHint = 20
             legendPosition = OutsideE
