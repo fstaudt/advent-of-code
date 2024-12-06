@@ -19,11 +19,12 @@ import org.junit.jupiter.api.Test
 
 class LeaderboardServiceTest {
 
-    class TestLeaderboardService: LeaderboardService() {
+    class TestLeaderboardService : LeaderboardService() {
         override fun getParameters(): None {
             throw UnsupportedOperationException("Not supported yet.")
         }
     }
+
     private val leaderboardService = TestLeaderboardService()
     private val owner = member(OWNER_ID, 12).withCompletionParts(
         1 to mapOf(part1(DAY1 + 1), part2(DAY1 + 2)),
@@ -127,6 +128,22 @@ class LeaderboardServiceTest {
     fun `topMembers should return rankings`() {
         val topMembers = leaderboardService.topMembers(leaderboard(owner, player), 2)
         assertThat(topMembers[0].rankings).isEqualTo(listOf(1, 1, 1))
+        assertThat(topMembers[1].rankings).isEqualTo(listOf(2, 2, 2))
+    }
+
+    @Test
+    fun `topMembers should keep ranking of previous day when members haven't completed current day`() {
+        val owner = member(OWNER_ID, 4).withCompletionParts(
+            3 to mapOf(part1(DAY3 + 4), part2(DAY3 + 5))
+        )
+        val player = member(PLAYER_ID, 5).withCompletionParts(
+            1 to mapOf(part1(DAY3 + 1), part2(DAY3 + 2)),
+            3 to mapOf(part1(DAY3 + 3))
+        )
+        val topMembers = leaderboardService.topMembers(leaderboard(owner, player), 2, until = 3)
+        assertThat(topMembers[0].id).isEqualTo(PLAYER_ID)
+        assertThat(topMembers[0].rankings).isEqualTo(listOf(1, 1, 1))
+        assertThat(topMembers[1].id).isEqualTo(OWNER_ID)
         assertThat(topMembers[1].rankings).isEqualTo(listOf(2, 2, 2))
     }
 
