@@ -66,6 +66,11 @@ abstract class LeaderboardSlopeChartTask : DefaultTask() {
     abstract val final: Property<Boolean>
 
     @get:Input
+    @get:Option(option = "ghosts", description = "include ghost members in slope chart")
+    @get:Optional
+    abstract val ghosts: Property<Boolean>
+
+    @get:Input
     @get:Option(
         option = "min",
         description = "minimum required number of appearances in top for members not in top on last day"
@@ -125,9 +130,10 @@ abstract class LeaderboardSlopeChartTask : DefaultTask() {
         val from = from.get()
         val until = until.get()
         val min = min.get()
+        val ghosts = ghosts.get()
         val final = final.get()
         val leaderboard = jsonMapper.get().readValue(leaderboardFile, Leaderboard::class.java)
-        val members = leaderboardService.get().topMembers(leaderboard, top, until, min, final)
+        val members = leaderboardService.get().topMembers(leaderboard, top, until, min, final, ghosts)
         val firstDay = runCatching { from.toInt() }.getOrElse { 1 }
         val lastDay = runCatching { until.toInt() }.getOrElse { 25 }.coerceAtMost(leaderboard.numberOfDays())
         val numberOfDays = lastDay - firstDay + 1

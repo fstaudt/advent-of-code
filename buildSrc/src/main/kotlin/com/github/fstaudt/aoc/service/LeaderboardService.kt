@@ -17,29 +17,25 @@ abstract class LeaderboardService : BuildService<None> {
         until: Int = leaderboard.numberOfDays(),
         min: Int = 1,
         final: Boolean = false,
+        ghosts: Boolean = false,
     ): List<Member> {
         leaderboard.computeLocalDailyScores(until)
+        val members =
+            if (ghosts) leaderboard.members.values else leaderboard.members.values.filter { it.localScore > 0 }
         for (day in 0..<until) {
-            leaderboard.members.values.sortedWith(
+            members.sortedWith(
                 compareByDescending<Member> { it.localDailyScores[day] }
                     .thenBy { it.completionDayLevels.day(day)?.part2()?.starIndex ?: MAX_VALUE }
                     .thenBy { it.completionDayLevels.day(day)?.part1()?.starIndex ?: MAX_VALUE }
-            ).let { members ->
-                members.filter { it.localScore > 0 }.forEachIndexed { index, member ->
-                    member.rankings.add((index + 1).takeIf { it <= top })
-                }
-            }
+                    .thenBy { if (day > 0) it.rankings[day - 1] else MAX_VALUE }
+            ).forEachIndexed { index, member -> member.rankings.add((index + 1).takeIf { it <= top }) }
         }
         if (final) {
-            leaderboard.members.values.sortedWith(
+            members.sortedWith(
                 compareByDescending<Member> { it.localScore }.thenByDescending { it.lastStarTimestamp }
-            ).let { members ->
-                members.filter { it.localScore > 0 }.forEachIndexed { index, member ->
-                    member.rankings.add((index + 1).takeIf { it <= top })
-                }
-            }
+            ).forEachIndexed { index, member -> member.rankings.add((index + 1).takeIf { it <= top }) }
         }
-        return leaderboard.members.values.filter { it.localScore > 0 }.sortedWith(
+        return members.sortedWith(
             if (final)
                 compareByDescending<Member> { it.localScore }.thenByDescending { it.lastStarTimestamp }
             else

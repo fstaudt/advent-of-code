@@ -19,7 +19,7 @@ generate a slope chart for a private leaderboard
 - run command:
 ``` shell
 ./gradlew leaderboardSlopeChart --year=<year> --id=<leaderboard-id> [--top=<top>] [--force] \
-   [--from=<from>] [--until=<until>] [--final]
+   [--from=<from>] [--until=<until>] [--final] [--ghosts]
 ```
 - `year`: year of advent calendar
 - `id`: ID of private leaderboard
@@ -31,7 +31,8 @@ generate a slope chart for a private leaderboard
 - `from`: first day displayed in slope chart (default: 1)
 - `until`: last day displayed in slope chart (default: 25)
 - `min`: minimum required number of appearances in top for members not in top on last day (default: 2)
-- `final`: include final ranking in slope chart
+- `final`: include final ranking in slope chart (default: false)
+- `ghosts`: include ghost members in slope chart (default: false)
 
 - Slope chart is generated in `build/aoc/leaderboards/<year>/<id>.json.png`
 

@@ -54,7 +54,7 @@ class LeaderboardServiceTest {
     }
 
     @Test
-    fun `topMembers should not return members that did not appear enought times in top`() {
+    fun `topMembers should not return members that did not appear enough times in top`() {
         val owner = member(OWNER_ID, 10).withCompletionParts(
             1 to mapOf(part1(DAY1 + 5), part2(DAY1 + 6)),
             2 to mapOf(part1(DAY2 + 1), part2(DAY2 + 2)),
@@ -98,10 +98,17 @@ class LeaderboardServiceTest {
     }
 
     @Test
-    fun `topMembers should filter ghost members`() {
+    fun `topMembers should exclude ghost members by default`() {
         val ghost = member(GHOST_ID, 0)
         val topMembers = leaderboardService.topMembers(leaderboard(owner, player, ghost), 3)
         assertThat(topMembers).hasSize(2)
+    }
+
+    @Test
+    fun `topMembers should include ghost members when enabled`() {
+        val ghost = member(GHOST_ID, 0)
+        val topMembers = leaderboardService.topMembers(leaderboard(owner, player, ghost), 3, ghosts = true)
+        assertThat(topMembers).hasSize(3)
     }
 
     @Test

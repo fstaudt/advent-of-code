@@ -26,6 +26,7 @@ class AdventOfCodePlugin : Plugin<Project> {
                     leaderboard.top.convention(20)
                     leaderboard.from.convention(1)
                     leaderboard.until.convention(25)
+                    leaderboard.ghosts.convention(false)
                     leaderboard.final.convention(false)
                     leaderboard.min.convention(2)
                     leaderboard.force.convention(false)
