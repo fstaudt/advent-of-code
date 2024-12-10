@@ -3,6 +3,7 @@ package com.github.fstaudt.aoc2024.day06
 import com.github.fstaudt.aoc.shared.Day
 import com.github.fstaudt.aoc.shared.Input.readInputLines
 import com.github.fstaudt.aoc.shared.Matrix
+import com.github.fstaudt.aoc.shared.MatrixExtensions.toMatrixOf
 import com.github.fstaudt.aoc2024.day06.Day06.Direction.*
 import com.github.fstaudt.aoc2024.day06.Day06.PositionType.*
 
@@ -12,7 +13,7 @@ fun main() {
 
 class Day06(fileName: String = "day_06.txt") : Day {
     override val input: List<String> = readInputLines(fileName)
-    private val room = Room(input.mapIndexed { i, line -> line.mapIndexed { j, it -> Position.of(it, i, j) } })
+    private val room = Room(input.toMatrixOf{ Position.of(it.i, it.j, it.char) })
 
     override fun part1(): Long {
         room.guard().visitRoom()
@@ -38,7 +39,7 @@ class Day06(fileName: String = "day_06.txt") : Day {
         fun variantWithObstacleOn(position: Position): Room {
             return Room(positions.map {
                 it.map { p ->
-                    Position(if (p == position) OBSTACLE else p.type, p.i, p.j)
+                    Position(p.i, p.j, if (p == position) OBSTACLE else p.type)
                 }
             })
         }
@@ -81,11 +82,11 @@ class Day06(fileName: String = "day_06.txt") : Day {
     }
 
     data class Position(
-        val type: PositionType, val i: Int, val j: Int,
+        val i: Int, val j: Int, val type: PositionType,
         var visited: MutableMap<Direction, Boolean> = mutableMapOf()
     ) {
         companion object {
-            fun of(char: Char, i: Int, j: Int) = Position(PositionType.of(char), i, j)
+            fun of(i: Int, j: Int, char: Char) = Position(i, j, PositionType.of(char))
         }
 
         fun visited() = visited.isNotEmpty()

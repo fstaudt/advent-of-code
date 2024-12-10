@@ -2,7 +2,9 @@ package com.github.fstaudt.aoc2024.day04
 
 import com.github.fstaudt.aoc.shared.Day
 import com.github.fstaudt.aoc.shared.Input.readInputLines
+import com.github.fstaudt.aoc.shared.Matrix
 import com.github.fstaudt.aoc.shared.MatrixExtensions.forEachEntry
+import com.github.fstaudt.aoc.shared.MatrixExtensions.toMatrixOf
 
 fun main() {
     Day04().run()
@@ -10,7 +12,7 @@ fun main() {
 
 class Day04(fileName: String = "day_04.txt") : Day {
     override val input: List<String> = readInputLines(fileName)
-    private val letters = input.mapIndexed { i, line -> line.mapIndexed { j, char -> Letter(char, i, j) } }
+    private val letters: Matrix<Letter> = input.toMatrixOf { Letter(it.i, it.j, it.char) }
 
     override fun part1(): Long {
         var count = 0L
@@ -33,7 +35,7 @@ class Day04(fileName: String = "day_04.txt") : Day {
         var count = 0L
         letters.forEachEntry { letter ->
             if (letter.char == 'A') {
-                val (_, i, j) = letter
+                val (i, j) = letter
                 if ((letters.letter(i - 1, j - 1) == 'M' && letters.letter(i + 1, j + 1) == 'S') ||
                     (letters.letter(i - 1, j - 1) == 'S' && letters.letter(i + 1, j + 1) == 'M')
                 ) {
@@ -48,15 +50,12 @@ class Day04(fileName: String = "day_04.txt") : Day {
         return count
     }
 
-    private fun List<List<Letter>>.spellMASFrom(letter: Letter, deltaI: Int, deltaJ: Int): Boolean {
+    private fun Matrix<Letter>.spellMASFrom(letter: Letter, deltaI: Int, deltaJ: Int): Boolean {
         return (letter(letter.i + 1 * deltaI, letter.j + 1 * deltaJ) == 'M')
             && (letter(letter.i + 2 * deltaI, letter.j + 2 * deltaJ) == 'A')
             && (letter(letter.i + 3 * deltaI, letter.j + 3 * deltaJ) == 'S')
     }
 
-    private fun List<List<Letter>>.letter(i: Int, j: Int): Char {
-        return if (i >= 0 && i < size && j >= 0 && j < get(0).size) get(i)[j].char else ' '
-    }
-
-    private data class Letter(val char: Char, val i: Int, val j: Int)
+    private fun Matrix<Letter>.letter(i: Int, j: Int) = getOrNull(i)?.getOrNull(j)?.char ?: ' '
+    private data class Letter(val i: Int, val j: Int, val char: Char)
 }

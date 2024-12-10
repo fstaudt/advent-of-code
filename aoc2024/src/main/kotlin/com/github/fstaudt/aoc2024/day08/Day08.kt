@@ -3,6 +3,7 @@ package com.github.fstaudt.aoc2024.day08
 import com.github.fstaudt.aoc.shared.Day
 import com.github.fstaudt.aoc.shared.Input.readInputLines
 import com.github.fstaudt.aoc.shared.Matrix
+import com.github.fstaudt.aoc.shared.MatrixExtensions.toMatrixOf
 
 fun main() {
     Day08().run()
@@ -10,14 +11,14 @@ fun main() {
 
 class Day08(fileName: String = "day_08.txt") : Day {
     override val input: List<String> = readInputLines(fileName)
-    val city = City(input.mapIndexed { i, line -> line.mapIndexed { j, char -> Location(i, j, char) } })
+    val city = City(input.toMatrixOf{ Location(it.i, it.j, it.char) })
 
     override fun part1(): Long {
         city.markAntiNodesWith { a1: Location, a2: Location ->
-            val dx = a2.x - a1.x
-            val dy = a2.y - a1.y
-            city.location(a2.x + dx, a2.y + dy)?.antiNode = true
-            city.location(a1.x - dx, a1.y - dy)?.antiNode = true
+            val dx = a2.i - a1.i
+            val dy = a2.j - a1.j
+            city.location(a2.i + dx, a2.j + dy)?.antiNode = true
+            city.location(a1.i - dx, a1.j - dy)?.antiNode = true
         }
         return city.locations().count { it.antiNode }.toLong()
     }
@@ -25,19 +26,19 @@ class Day08(fileName: String = "day_08.txt") : Day {
     override fun part2(): Long {
         city.antennas().forEach { it.antiNode = true }
         city.markAntiNodesWith { a1: Location, a2: Location ->
-            val dx = a2.x - a1.x
-            val dy = a2.y - a1.y
+            val di = a2.i - a1.i
+            val dj = a2.j - a1.j
             var h1 = 1
-            while (city.location(a2.x + h1 * dx, a2.y + h1 * dy)?.also { it.antiNode = true } != null) h1++
+            while (city.location(a2.i + h1 * di, a2.j + h1 * dj)?.also { it.antiNode = true } != null) h1++
             var h2 = 1
-            while (city.location(a1.x - h2 * dx, a1.y - h2 * dy)?.also { it.antiNode = true } != null) h2++
+            while (city.location(a1.i - h2 * di, a1.j - h2 * dj)?.also { it.antiNode = true } != null) h2++
         }
         return city.locations().count { it.antiNode }.toLong()
     }
 
-    data class Location(val x: Int, val y: Int, val frequency: Char, var antiNode: Boolean = false)
+    data class Location(val i: Int, val j: Int, val frequency: Char, var antiNode: Boolean = false)
     data class City(val locations: Matrix<Location>) {
-        fun location(x: Int, y: Int) = runCatching { locations[x][y] }.getOrNull()
+        fun location(i: Int, j: Int) = runCatching { locations[i][j] }.getOrNull()
         fun locations() = locations.flatMap { it }
         fun antennas() = locations().filter { it.frequency != '.' }
         fun markAntiNodesWith(markFor: (Location, Location) -> Unit) {
