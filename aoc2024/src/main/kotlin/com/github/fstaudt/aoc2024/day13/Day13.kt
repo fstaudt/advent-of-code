@@ -24,24 +24,32 @@ class Day13(fileName: String = "day_13.txt") : Day {
 
     override fun part1(): Long {
         val claws = input.chunked(4).map { Claw(Button.from(it[0]), Button.from(it[1]), Prize.from(it[2])) }
-        return claws.mapNotNull { it.cheapestWayToWin() }.sumOf { it.cost }
+        return claws.mapNotNull { it.wayToWin() }.sumOf { it.cost }
     }
 
     override fun part2(): Long {
         val offset = 10000000000000L
         val claws = input.chunked(4).map { Claw(Button.from(it[0]), Button.from(it[1]), Prize.from(it[2], offset)) }
-        return claws.mapNotNull { it.cheapestWayToWinZ3() }.sumOf { it.cost }
+        return claws.mapNotNull { it.wayToWin() }.sumOf { it.cost }
     }
 
     data class Claw(val a: Button, val b: Button, val prize: Prize) {
+        fun wayToWin(): Way? {
+            val nb = (prize.y * a.dx - prize.x * a.dy) / (b.dy * a.dx - b.dx * a.dy)
+            val na = (prize.x - nb * b.dx) / a.dx
+            return if (na >= 0 && nb >= 0 && na * a.dx + nb * b.dx == prize.x && na * a.dy + nb * b.dy == prize.y) {
+                Way(na, nb)
+            } else null
+        }
+
         fun cheapestWayToWin(): Way? {
             var cheapestWay: Way? = null
             for (na in 0L..100) {
                 var nb = (prize.x - na * a.dx) / b.dx
                 if (na * a.dx + nb * b.dx == prize.x && na * a.dy + nb * b.dy == prize.y) {
-                    val cost = 3L * na + nb
-                    if (cost < (cheapestWay?.cost ?: MAX_VALUE)) {
-                        cheapestWay = Way(na, nb, cost)
+                    val way = Way(na, nb)
+                    if (way.cost < (cheapestWay?.cost ?: MAX_VALUE)) {
+                        cheapestWay = way
                     }
                 }
                 if (na * a.dx > prize.x && na * a.dy > prize.y) {
@@ -51,25 +59,24 @@ class Day13(fileName: String = "day_13.txt") : Day {
             return cheapestWay
         }
 
-        fun cheapestWayToWinZ3(): Way? {
+        fun wayToWinZ3(): Way? {
+            data class Z3Way(val na: IntExpr, val nb: IntExpr)
+            fun Model.evalAsLong(expr: Expr<*>) = eval(expr, false).toString().toLong()
             Context().use { context ->
                 with(context) {
                     val solver = mkSolver()
-                    val way = Z3Way(mkIntConst("na"), mkIntConst("nb"), mkIntConst("cost"))
+                    val way = Z3Way(mkIntConst("na"), mkIntConst("nb"))
                     solver.add(
                         mkEq(mkAdd(mkMul(way.na, mkInt(a.dx)), mkMul(way.nb, mkInt(b.dx))), mkInt(prize.x)),
                         mkEq(mkAdd(mkMul(way.na, mkInt(a.dy)), mkMul(way.nb, mkInt(b.dy))), mkInt(prize.y)),
-                        mkEq(mkAdd(mkMul(mkInt(3), way.na), way.nb), way.cost),
                     )
                     if (solver.check() == UNSATISFIABLE) return null
                     return with(solver.model) {
-                        Way(evalAsLong(way.na), evalAsLong(way.nb), evalAsLong(way.cost))
+                        Way(evalAsLong(way.na), evalAsLong(way.nb))
                     }
                 }
             }
         }
-
-        private fun Model.evalAsLong(expr: Expr<*>) = eval(expr, false).toString().toLong()
     }
 
     data class Button(val dx: Long, val dy: Long) {
@@ -88,6 +95,7 @@ class Day13(fileName: String = "day_13.txt") : Day {
         }
     }
 
-    data class Way(val na: Long, val nb: Long, val cost: Long)
-    data class Z3Way(val na: IntExpr, val nb: IntExpr, val cost: IntExpr)
+    data class Way(val na: Long, val nb: Long) {
+        val cost: Long = 3*na + nb
+    }
 }
