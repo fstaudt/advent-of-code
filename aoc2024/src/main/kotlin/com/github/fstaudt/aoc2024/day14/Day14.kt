@@ -4,6 +4,7 @@ import com.github.fstaudt.aoc.shared.Day
 import com.github.fstaudt.aoc.shared.Input.readInputLines
 import com.github.fstaudt.aoc.shared.MatchResultExtensions.intGroup
 import com.github.fstaudt.aoc.shared.Matrix
+import com.github.fstaudt.aoc.shared.MatrixExtensions.flip
 import com.github.fstaudt.aoc.shared.MatrixExtensions.printToPng
 import java.awt.Color.BLACK
 import java.awt.Color.WHITE
@@ -37,7 +38,7 @@ class Day14(val fileName: String = "day_14.txt", val bathroom: Bathroom = Bathro
         while (robot.moves < 10000 && !bathroom.isChristmasTree()) {
             robots.forEach { it.moveIn(bathroom) }
         }
-        bathroom.display().positions.printToPng("${fileName}-${robot.moves}") { if (it.busy) BLACK else WHITE }
+        bathroom.display().positions.flip().printToPng("${fileName}-${robot.moves}") { if (it.busy) BLACK else WHITE }
         return robot.moves
     }
 

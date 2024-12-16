@@ -7,7 +7,7 @@ import java.io.File
 import javax.imageio.ImageIO
 
 object MatrixExtensions {
-    fun <E> Matrix<E>.flipMatrix() = List(get(0).size) { c -> map { it[c] } }
+    fun <E> Matrix<E>.flip() = List(get(0).size) { c -> map { it[c] } }
     fun <E> Matrix<E>.tiltClockwise() = List(get(0).size) { c -> map { it[c] }.reversed() }
     fun <E> Matrix<E>.forEachEntry(op: (E) -> Unit) = forEach { it.forEach(op) }
     fun <E> List<String>.toMatrixOf(op: (Element) -> E): Matrix<E> {

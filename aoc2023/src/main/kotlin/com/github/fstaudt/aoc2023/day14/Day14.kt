@@ -1,7 +1,7 @@
 package com.github.fstaudt.aoc2023.day14
 
 import com.github.fstaudt.aoc.shared.Day
-import com.github.fstaudt.aoc.shared.MatrixExtensions.flipMatrix
+import com.github.fstaudt.aoc.shared.MatrixExtensions.flip
 import com.github.fstaudt.aoc.shared.MatrixExtensions.tiltClockwise
 import com.github.fstaudt.aoc.shared.Input.readInputLines
 import com.github.fstaudt.aoc2023.day14.Day14.Type.*
@@ -55,7 +55,7 @@ class Day14(fileName: String = "day_14.txt") : Day {
 
     data class Platform(val lines: List<List<Position>>) {
         fun moveRoundedRocks() {
-            val flippedLines = lines.flipMatrix()
+            val flippedLines = lines.flip()
             for (l in flippedLines.indices) {
                 var target: Int? = null
                 for (p in (0..<flippedLines[l].size)) {
@@ -74,7 +74,7 @@ class Day14(fileName: String = "day_14.txt") : Day {
         }
 
         fun sumRockLoads(): Long {
-            return lines.flipMatrix().map { line ->
+            return lines.flip().map { line ->
                 line.mapIndexedNotNull { index, position ->
                     (line.size - index).takeIf { position.type == ROUNDED_ROCK }
                 }.sumOf { it.toLong() }
