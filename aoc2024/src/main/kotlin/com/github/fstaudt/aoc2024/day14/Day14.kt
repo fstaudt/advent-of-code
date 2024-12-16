@@ -4,12 +4,9 @@ import com.github.fstaudt.aoc.shared.Day
 import com.github.fstaudt.aoc.shared.Input.readInputLines
 import com.github.fstaudt.aoc.shared.MatchResultExtensions.intGroup
 import com.github.fstaudt.aoc.shared.Matrix
+import com.github.fstaudt.aoc.shared.MatrixExtensions.printToPng
 import java.awt.Color.BLACK
 import java.awt.Color.WHITE
-import java.awt.image.BufferedImage
-import java.awt.image.BufferedImage.TYPE_INT_RGB
-import java.io.File
-import javax.imageio.ImageIO
 import kotlin.math.sign
 
 fun main() {
@@ -36,11 +33,12 @@ class Day14(val fileName: String = "day_14.txt", val bathroom: Bathroom = Bathro
         val robots = input.map {
             ROBOT_REGEX.find(it).run { Robot(intGroup("x"), intGroup("y"), intGroup("dx"), intGroup("dy")) }
         }.also { bathroom.robots = it }
-        while (robots[0].moves < 10000 && !bathroom.isChristmasTree()) {
+        val robot = robots[0]
+        while (robot.moves < 10000 && !bathroom.isChristmasTree()) {
             robots.forEach { it.moveIn(bathroom) }
         }
-        bathroom.display().printToPng("${fileName}-${robots[0].moves}")
-        return robots[0].moves
+        bathroom.display().positions.printToPng("${fileName}-${robot.moves}") { if (it.busy) BLACK else WHITE }
+        return robot.moves
     }
 
     fun List<Robot>.countInQuadrant(upDown: Int, leftRight: Int) = count {
@@ -144,18 +142,6 @@ class Day14(val fileName: String = "day_14.txt", val bathroom: Bathroom = Bathro
             val leftSpan = (1..51).takeWhile { position(robot.x - it, robot.y)?.busy == true }.size
             val rightSpan = (1..51).takeWhile { position(robot.x + it, robot.y)?.busy == true }.size
             return leftSpan.takeIf { it == rightSpan } ?: 0
-        }
-
-        fun printToPng(fileName: String) {
-            val width = positions.size
-            val height = positions[0].size
-            val image = BufferedImage(width, height, TYPE_INT_RGB)
-            (0 until width).forEach { x ->
-                (0 until height).forEach { y ->
-                    image.setRGB(x, y, if (positions[x][y].busy) BLACK.rgb else WHITE.rgb)
-                }
-            }
-            ImageIO.write(image, "png", File("build/png/$fileName.png").also { it.parentFile.mkdirs() })
         }
     }
 
