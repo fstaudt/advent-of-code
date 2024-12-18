@@ -11,7 +11,10 @@ object MatrixExtensions {
     fun <E> Matrix<E>.tiltClockwise() = List(get(0).size) { c -> map { it[c] }.reversed() }
     fun <E> Matrix<E>.forEachEntry(op: (E) -> Unit) = forEach { it.forEach(op) }
     fun <E> Matrix<E>.entry(i: Int, j: Int): E? = getOrNull(i)?.getOrNull(j)
-    fun <E> Matrix<E>.entry(i: Int, j: Int, dir: Direction): E? = getOrNull(i+dir.di)?.getOrNull(j+dir.dj)
+    fun <E> Matrix<E>.entry(i: Int, j: Int, dir: Direction, steps: Int = 1): E? {
+        return getOrNull(i + steps * dir.di)?.getOrNull(j + steps * dir.dj)
+    }
+
     fun <E> List<String>.toMatrixOf(op: (Element) -> E): Matrix<E> {
         return mapIndexed { i, line -> line.mapIndexed { j, c -> op(Element(i, j, c)) } }
     }
