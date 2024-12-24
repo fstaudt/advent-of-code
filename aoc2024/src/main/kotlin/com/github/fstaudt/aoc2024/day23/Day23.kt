@@ -13,15 +13,7 @@ class Day23(fileName: String = "day_23.txt") : Day {
     private val connectionsMap = connections.groupBy { it[0] }.mapValues { cn -> cn.value.map { it[1] }.toSet() }
 
     override fun part1(): Long {
-        val lanParties = connectionsMap.mapNotNull { (c1, list1) ->
-            list1.mapIndexedNotNull { i, c2 ->
-                connectionsMap[c2]?.let { list2 ->
-                    list1.drop(i + 1).filter { list2.contains(it) }.map { c3 ->
-                        LanParty(listOf(c1, c2, c3))
-                    }.takeIf { it.isNotEmpty() }
-                }
-            }.flatten()
-        }.flatten()
+        val lanParties = connections.map { LanParty(it) }.toBiggerLanParties()
         return lanParties.filter { cluster -> cluster.list.any { it.startsWith("t") } }.size.toLong()
     }
 
