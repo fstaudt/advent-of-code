@@ -8,12 +8,12 @@ plugins {
 }
 
 dependencies {
-    implementation("org.apache.httpcomponents:httpclient:4.5.14") {
-        exclude("commons-codec", "commons-codec")
-    }
-    implementation("org.knowm.xchart:xchart:3.8.8")
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.18.2")
-    api("com.fasterxml.jackson.module:jackson-module-kotlin:2.18.2")
+  implementation("org.apache.httpcomponents:httpclient:4.5.14") {
+    exclude("commons-codec", "commons-codec")
+  }
+  implementation("org.knowm.xchart:xchart:3.8.8")
+  implementation("tools.jackson.core:jackson-databind:3.0.3")
+  api("tools.jackson.module:jackson-module-kotlin:3.0.3")
 }
 
 gradlePlugin {
