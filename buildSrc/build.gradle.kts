@@ -14,9 +14,6 @@ dependencies {
     implementation("org.knowm.xchart:xchart:3.8.8")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.18.2")
     api("com.fasterxml.jackson.module:jackson-module-kotlin:2.18.2")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.11.3")
-    testImplementation("org.assertj:assertj-core:3.26.3")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.11.3")
 }
 
 gradlePlugin {
@@ -28,6 +25,16 @@ gradlePlugin {
     }
 }
 
-tasks.test {
-    useJUnitPlatform()
+testing {
+  suites {
+    @Suppress("UnstableApiUsage")
+    named<JvmTestSuite>("test") {
+      useJUnitJupiter()
+      dependencies {
+        implementation("org.junit.jupiter:junit-jupiter-api:6.0.1")
+        implementation("org.assertj:assertj-core:3.27.6")
+        runtimeOnly("org.junit.jupiter:junit-jupiter-engine:6.0.1")
+      }
+    }
+  }
 }

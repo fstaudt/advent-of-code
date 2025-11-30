@@ -5,14 +5,19 @@ plugins {
 repositories {
     mavenCentral()
 }
-val junitVersion: String by project
-dependencies {
-    testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
-    testImplementation("org.assertj:assertj-core:3.26.3")
-    testImplementation("org.junit.jupiter:junit-jupiter-params:$junitVersion")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
-}
 
-tasks.test {
-    useJUnitPlatform()
+testing {
+  suites {
+    @Suppress("UnstableApiUsage")
+    named<JvmTestSuite>("test") {
+      useJUnitJupiter()
+      val junitVersion: String by project
+      val assertjVersion: String by project
+      dependencies {
+        implementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
+        implementation("org.assertj:assertj-core:${assertjVersion}")
+        implementation("org.junit.jupiter:junit-jupiter-params:${junitVersion}")
+        runtimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")      }
+    }
+  }
 }
