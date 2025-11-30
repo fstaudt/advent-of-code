@@ -3,6 +3,8 @@
 ## Solutions
 
 - [2023](aoc2023/src/main/kotlin/com/github/fstaudt/aoc2023)
+- [2024](aoc2024/src/main/kotlin/com/github/fstaudt/aoc2024)
+- [2025](aoc2025/src/main/kotlin/com/github/fstaudt/aoc2025)
 
 ## Gradle tasks
 
