@@ -45,7 +45,23 @@ class LeaderboardServiceTest {
         assertThat(topMembers[1].id).isEqualTo(PLAYER_ID)
     }
 
-    @Test
+  @Test
+  fun `topMembers should return members ordered by local score then by last star timestamp`() {
+    val firstByLastStar = member(OWNER_ID, 8, DAY2 + 2).withCompletionParts(
+      1 to mapOf(part1(DAY1 + 3), part2(DAY1 + 4)),
+      2 to mapOf(part1(DAY2 + 1), part2(DAY2 + 2)),
+    )
+    val secondByLastStar = member(PLAYER_ID, 8, DAY2 + 4).withCompletionParts(
+      1 to mapOf(part1(DAY1 + 1), part2(DAY1 + 2)),
+      2 to mapOf(part1(DAY2 + 3), part2(DAY2 + 4)),
+    )
+    val topMembers = leaderboardService.topMembers(leaderboard(firstByLastStar, secondByLastStar), 2)
+    assertThat(topMembers).hasSize(2)
+    assertThat(topMembers[0].id).isEqualTo(OWNER_ID)
+    assertThat(topMembers[1].id).isEqualTo(PLAYER_ID)
+  }
+
+  @Test
     fun `topMembers should return only top members`() {
         val ghost = member("00000", 0)
         val topMembers = leaderboardService.topMembers(leaderboard(owner, player, ghost), 2)

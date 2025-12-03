@@ -32,14 +32,14 @@ abstract class LeaderboardService : BuildService<None> {
         }
         if (final) {
             members.sortedWith(
-                compareByDescending<Member> { it.localScore }.thenByDescending { it.lastStarTimestamp }
+                compareByDescending<Member> { it.localScore }.thenBy { it.lastStarTimestamp }
             ).forEachIndexed { index, member -> member.rankings.add((index + 1).takeIf { it <= top }) }
         }
         return members.sortedWith(
             if (final)
-                compareByDescending<Member> { it.localScore }.thenByDescending { it.lastStarTimestamp }
+                compareByDescending<Member> { it.localScore }.thenBy { it.lastStarTimestamp }
             else
-                compareByDescending<Member> { it.localDailyScores[until - 1] }.thenByDescending { it.lastStarTimestamp }
+                compareByDescending<Member> { it.localDailyScores[until - 1] }.thenBy { it.lastStarTimestamp }
         ).filterIndexed { index, member -> index < top || member.rankings.count { it != null } > min }
     }
 
