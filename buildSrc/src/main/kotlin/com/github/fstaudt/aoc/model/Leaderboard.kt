@@ -6,6 +6,7 @@ data class Leaderboard(
     val event: String,
     @param:JsonProperty("day1_ts") val day1Timestamp: String?,
     @param:JsonProperty("owner_id") val ownerId: String,
+    @param:JsonProperty("num_days") val numDays: Int,
     val members: Map<String, Member>,
 ) {
     fun owner() = members[ownerId]?.name() ?: "(anonymous user #$ownerId)"

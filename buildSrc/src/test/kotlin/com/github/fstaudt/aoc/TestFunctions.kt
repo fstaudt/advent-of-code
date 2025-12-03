@@ -12,11 +12,11 @@ import com.github.fstaudt.aoc.model.Member
 internal object TestFunctions {
     fun part1(timestamp: Int) = 1 to CompletionPart(timestamp - 1L, timestamp - 1)
     fun part2(timestamp: Int) = 2 to CompletionPart(timestamp - 1L, timestamp - 1)
-    fun member(id: String, localScore: Int) = id to Member(id, id, 0, DAY3, localScore, 0, emptyMap())
+    fun member(id: String, localScore: Int, lastStarTimestamp: Int = DAY3) = id to Member(id, id, 0, lastStarTimestamp, localScore, emptyMap())
     fun leaderboard(vararg members: Pair<String, Member>) =
-        Leaderboard(EVENT, EVENT_TIMESTAMP, OWNER_ID, mapOf(*members))
+        Leaderboard(EVENT, EVENT_TIMESTAMP, OWNER_ID, 25, mapOf(*members))
 
     fun Pair<String, Member>.withCompletionParts(vararg completionParts: Pair<Int, CompletionParts>) = second.run {
-        first to Member(id, id, stars, lastStarTimestamp, localScore, globalScore, mapOf(*completionParts))
+        first to Member(id, id, stars, lastStarTimestamp, localScore, mapOf(*completionParts))
     }
 }
