@@ -134,12 +134,12 @@ abstract class LeaderboardSlopeChartTask : DefaultTask() {
         val final = final.get()
         val leaderboard = jsonMapper.get().readValue(leaderboardFile, Leaderboard::class.java)
         val members = leaderboardService.get().topMembers(leaderboard, top, until, min, final, ghosts)
-        val firstDay = runCatching { from.toInt() }.getOrElse { 1 }
-        val lastDay = runCatching { until.toInt() }.getOrElse { 25 }.coerceAtMost(leaderboard.numberOfDays())
+        val firstDay = runCatching { from }.getOrElse { 1 }
+        val lastDay = runCatching { until }.getOrElse { leaderboard.numDays }.coerceAtMost(leaderboard.numberOfDays())
         val numberOfDays = lastDay - firstDay + 1
         val chart = XYChartBuilder()
             .width(max(1250,(numberOfDays + (if (final) 1 else 0)) * 120 + 150))
-            .height(members.size * 30)
+            .height(max(150, members.size * 30))
             .xAxisTitle("Day")
             .title("Advent of Code $year - private leaderboard of ${leaderboard.owner()} ($id) - top $top")
             .build()
@@ -156,10 +156,10 @@ abstract class LeaderboardSlopeChartTask : DefaultTask() {
             legendBackgroundColor = WHITE
             legendBorderColor = WHITE
             xAxisTickMarksColor = WHITE
-            setxAxisTickLabelsFormattingFunction { if (it > 25) "final" else "${it.toInt()}" }
+            setxAxisTickLabelsFormattingFunction { if (it > leaderboard.numberOfDays()) "final" else "${it.toInt()}" }
             yAxisTickMarksColor = WHITE
         }
-        val days = (firstDay..lastDay).toList() + (if (final) listOf(26) else emptyList())
+        val days = (firstDay..lastDay).toList() + (if (final) listOf(leaderboard.numberOfDays()+1) else emptyList())
         members.forEachIndexed { index, member ->
             val rankings = member.rankings.drop(firstDay - 1).take(numberOfDays).toMutableList().also {
                 if (final) it += member.rankings.last()

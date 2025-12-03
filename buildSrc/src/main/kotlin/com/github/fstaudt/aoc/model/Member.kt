@@ -9,7 +9,6 @@ data class Member(
     val stars: Int,
     @param:JsonProperty("last_star_ts") val lastStarTimestamp: Int,
     @param:JsonProperty("local_score") val localScore: Int,
-    @param:JsonProperty("global_score") val globalScore: Int,
     @param:JsonProperty("completion_day_level") val completionDayLevels: CompletionDayLevels,
     @JsonIgnore var localDailyScore: Int = 0,
     @JsonIgnore val localDailyScores: MutableList<Int> = mutableListOf(),
