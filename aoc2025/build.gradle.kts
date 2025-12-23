@@ -1,14 +1,15 @@
 plugins {
-    kotlin("jvm") version embeddedKotlinVersion
-    id("buildSrc.aoc")
+  kotlin("jvm") version embeddedKotlinVersion
+  id("buildSrc.aoc")
 }
 
 repositories {
-    mavenCentral()
+  mavenCentral()
 }
 
 dependencies {
-    implementation(project(":shared"))
+  implementation(project(":shared"))
+  implementation("tools.aqua:z3-turnkey:4.14.1")
 }
 
 testing {
@@ -22,11 +23,12 @@ testing {
         implementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
         implementation("org.assertj:assertj-core:${assertjVersion}")
         implementation("org.junit.jupiter:junit-jupiter-params:${junitVersion}")
-        runtimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")      }
+        runtimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
+      }
     }
   }
 }
 
 adventOfCode {
-    year = 2025
+  year = 2025
 }
