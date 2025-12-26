@@ -10,6 +10,8 @@ repositories {
 dependencies {
   implementation(project(":shared"))
   implementation("tools.aqua:z3-turnkey:4.14.1")
+  implementation("guru.nidi:graphviz-java:0.18.1")
+  runtimeOnly("com.eclipsesource.j2v8:j2v8_win32_x86_64:4.6.0")
 }
 
 testing {
